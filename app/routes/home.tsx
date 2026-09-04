@@ -1,7 +1,6 @@
 import { env } from "cloudflare:workers";
 
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -15,5 +14,5 @@ export function loader() {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  return <Welcome message={loaderData.message} />;
+  return <div>ホーム画面だよー</div>;
 }
