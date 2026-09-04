@@ -1,0 +1,14 @@
+.event-card {
+  border: 1px solid #ccc;
+  margin: 2rem;
+  padding: 2rem;
+  min-width: calc(min(100% - 1rem, 800px));
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+
+  h2,
+  p {
+    margin: 0;
+  }
+}

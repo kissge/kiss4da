@@ -54,7 +54,7 @@ export default function Books({ loaderData }: Route.ComponentProps) {
       {loaderData.map((book, index) => (
         <div key={index} className="book-card">
           <div className="book-bio">
-            <h2>{book.title}</h2>
+            <h2>📙{book.title}</h2>
             <p>
               {book.author} / {book.publishedOn} / {book.questionCount}問収録
             </p>
