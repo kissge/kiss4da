@@ -6,8 +6,7 @@ export default function GlobalHeader() {
     <header id="global-header">
       kiss4da
       <div className="spacer" />
-      <NavLink to="/">Home</NavLink>
-      <NavLink to="/books">Books</NavLink>
+      <NavLink to="/books">問題集</NavLink>
     </header>
   );
 }

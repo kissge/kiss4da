@@ -7,4 +7,11 @@ body {
 
 body {
   padding-top: 50px;
+  display: flex;
+  justify-content: center;
+}
+
+main {
+  max-width: 800px;
+  box-sizing: border-box;
 }
