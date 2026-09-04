@@ -5,4 +5,5 @@ export default [
   route("books", "routes/books.tsx"),
   route("events", "routes/events.tsx"),
   route("circles", "routes/circles.tsx"),
+  route("me", "routes/me.tsx"),
 ] satisfies RouteConfig;

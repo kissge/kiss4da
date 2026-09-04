@@ -23,7 +23,8 @@
     margin-right: 20px;
     transition: color 0.3s ease;
 
-    &:hover {
+    &:hover,
+    &.active {
       color: #ff0;
     }
   }

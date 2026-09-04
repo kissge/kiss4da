@@ -1,0 +1,13 @@
+.profile {
+  border: 1px solid #ccc;
+  margin: 2rem 0;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}

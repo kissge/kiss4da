@@ -16,3 +16,19 @@ main {
   max-width: 800px;
   box-sizing: border-box;
 }
+
+.table {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+
+  .row {
+    display: contents;
+
+    .cell {
+      grid-column: span 1;
+      border-bottom: 1px solid #ccc;
+    }
+  }
+}
