@@ -1,0 +1,24 @@
+.circle-header {
+  display: flex;
+  align-items: center;
+
+  h1 {
+    flex-grow: 1;
+  }
+}
+
+.book-table {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.book-row {
+  display: contents;
+}
+
+.book-cell {
+  grid-column: span 1;
+  border-bottom: 1px solid #ccc;
+}

@@ -8,6 +8,7 @@ export default function GlobalHeader() {
       <div className="spacer" />
       <NavLink to="/books">問題集</NavLink>
       <NavLink to="/events">フリバ</NavLink>
+      <NavLink to="/circles">サークル</NavLink>
     </header>
   );
 }
