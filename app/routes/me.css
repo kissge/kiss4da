@@ -4,10 +4,3 @@
   padding: 2rem;
   box-sizing: border-box;
 }
-
-.toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
