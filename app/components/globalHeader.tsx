@@ -9,7 +9,7 @@ export default function GlobalHeader() {
       <NavLink to="/books">問題集</NavLink>
       <NavLink to="/events">フリバ</NavLink>
       <NavLink to="/circles">サークル</NavLink>
-      <NavLink to="/me">マイページ</NavLink>
+      <NavLink to="/users/1">マイページ</NavLink>
     </header>
   );
 }

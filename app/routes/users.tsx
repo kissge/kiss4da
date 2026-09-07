@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
-import "./me.css";
-import type { Route } from "./+types/me";
+import "./users.css";
+import type { Route } from "./+types/users";
 import type { UserBook } from "~/types/books";
 import BookCard from "~/components/bookCard";
 
