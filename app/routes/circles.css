@@ -6,3 +6,9 @@
     flex-grow: 1;
   }
 }
+
+.book-members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25em;
+}

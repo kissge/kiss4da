@@ -1,7 +1,7 @@
 import type { Book } from "~/types/books";
 import "./bookCard.css";
 
-export default function BookCard({ book }: { book: Book }) {
+export default function BookCard({ book, children }: { book: Book; children?: React.ReactNode }) {
   return (
     <div className="book-card">
       <div className="book-bio">
@@ -16,7 +16,7 @@ export default function BookCard({ book }: { book: Book }) {
           </a>
         )}
       </div>
-      <div className="book-me"></div>
+      {children && <div className="book-me">{children}</div>}
     </div>
   );
 }

@@ -8,8 +8,8 @@ export default function GlobalHeader() {
       <div className="spacer" />
       <NavLink to="/books">問題集</NavLink>
       <NavLink to="/events">フリバ</NavLink>
-      <NavLink to="/circles">サークル</NavLink>
-      <NavLink to="/users/x_user_1">マイページ</NavLink>
+      <NavLink to="/circles/1">サークル</NavLink>
+      <NavLink to="/users/alice_dev">マイページ</NavLink>
     </header>
   );
 }

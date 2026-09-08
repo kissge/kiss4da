@@ -12,3 +12,14 @@ export interface UserBook extends Book {
   comment: string | null;
   owned: 0 | 1;
 }
+
+export interface CircleBook extends Book {
+  members: Record<
+    "unread" | "incomplete" | "read",
+    {
+      name: string;
+      comment: string | null;
+      owned: 0 | 1;
+    }[]
+  >;
+}
