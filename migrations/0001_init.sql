@@ -23,6 +23,8 @@ CREATE TABLE users (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX idx_users_x_id ON users(x_id);
+
 CREATE TABLE events (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   organizer_id INTEGER NOT NULL,

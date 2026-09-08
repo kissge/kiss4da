@@ -2,6 +2,7 @@ import { env } from "cloudflare:workers";
 import type { Event } from "~/types/events";
 import type { Route } from "./+types/events";
 import "./events.css";
+import { Link } from "react-router/internal/react-server-client";
 
 export async function loader() {
   const raw = (
@@ -81,7 +82,10 @@ export default function Events({ loaderData }: Route.ComponentProps) {
           <div className="event-bio">
             <p>{event.datetime}</p>
             <p>
-              {event.organizer.displayName} @{event.organizer.xID} が{event.title}を開催しました。
+              <Link to={`/users/${event.organizer.xID}`}>
+                {event.organizer.displayName} @{event.organizer.xID}
+              </Link>
+              が{event.title}を開催しました。
             </p>
           </div>
           <div className="event-books">
