@@ -7,9 +7,107 @@
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
+  @apply bg-white text-gray-950;
+  margin: 0;
+  min-width: 320px;
 
   @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
+    @apply bg-gray-950 text-gray-50;
+  }
+}
+
+body {
+  min-height: 100dvh;
+}
+
+.app-shell {
+  min-height: 100dvh;
+}
+
+.app-content {
+  min-height: 100dvh;
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+}
+
+.page {
+  box-sizing: border-box;
+  margin: 0 auto;
+  max-width: 42rem;
+  padding: 2.5rem 1.25rem;
+}
+
+.page__eyebrow {
+  color: #64748b;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  margin: 0 0 0.75rem;
+}
+
+.page__title {
+  font-size: clamp(1.75rem, 8vw, 2.5rem);
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.page__description {
+  color: #64748b;
+  line-height: 1.7;
+  margin: 1rem 0 0;
+}
+
+.bottom-tab-bar {
+  background: rgb(255 255 255 / 0.92);
+  border-top: 1px solid #e2e8f0;
+  bottom: 0;
+  left: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  position: fixed;
+  right: 0;
+  z-index: 10;
+  backdrop-filter: blur(16px);
+}
+
+.bottom-tab-bar__inner {
+  display: flex;
+  margin: 0 auto;
+  max-width: 42rem;
+}
+
+.bottom-tab {
+  align-items: center;
+  color: #94a3b8;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  font-size: 0.72rem;
+  font-weight: 600;
+  gap: 0.3rem;
+  min-height: 4rem;
+  justify-content: center;
+  padding: 0.45rem 0.75rem;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.bottom-tab__icon {
+  height: 1.35rem;
+  width: 1.35rem;
+}
+
+.bottom-tab--active {
+  color: #2563eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  .page__eyebrow,
+  .page__description {
+    color: #94a3b8;
+  }
+
+  .bottom-tab-bar {
+    background: rgb(3 7 18 / 0.92);
+    border-color: #1e293b;
   }
 }
