@@ -57,6 +57,111 @@ body {
   margin: 1rem 0 0;
 }
 
+.sr-only {
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+  clip: rect(0, 0, 0, 0);
+}
+
+.question-book-form {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 2rem;
+}
+
+.question-book-form__input,
+.form-field input,
+.form-field textarea {
+  background: transparent;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.65rem;
+  box-sizing: border-box;
+  color: inherit;
+  font: inherit;
+  min-width: 0;
+  padding: 0.75rem 0.85rem;
+  width: 100%;
+}
+
+.question-book-form__input {
+  flex: 1;
+}
+
+.question-book-form__input:focus,
+.form-field input:focus,
+.form-field textarea:focus {
+  border-color: #2563eb;
+  outline: 2px solid rgb(37 99 235 / 0.2);
+  outline-offset: 1px;
+}
+
+.question-book-form__button {
+  background: #2563eb;
+  border: 0;
+  border-radius: 0.65rem;
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.75rem 1.1rem;
+}
+
+.reading-details {
+  border-bottom: 1px solid #e2e8f0;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 1.5rem;
+}
+
+.reading-details summary {
+  cursor: pointer;
+  font-weight: 700;
+  padding: 1rem 0;
+}
+
+.reading-details__fields {
+  display: grid;
+  gap: 1rem;
+  padding: 0 0 1.25rem;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.form-field span {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.form-field textarea {
+  resize: vertical;
+}
+
+.question-book-list {
+  margin-top: 2rem;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.question-book-list__empty {
+  border: 1px dashed #cbd5e1;
+  border-radius: 0.75rem;
+  color: #64748b;
+  margin-top: 0.75rem;
+  padding: 1.5rem 1rem;
+  text-align: center;
+}
+
+.question-book-list__empty p {
+  margin: 0;
+}
+
 .bottom-tab-bar {
   background: rgb(255 255 255 / 0.92);
   border-top: 1px solid #e2e8f0;
@@ -102,12 +207,23 @@ body {
 
 @media (prefers-color-scheme: dark) {
   .page__eyebrow,
-  .page__description {
+  .page__description,
+  .question-book-list__empty {
     color: #94a3b8;
   }
 
   .bottom-tab-bar {
     background: rgb(3 7 18 / 0.92);
+    border-color: #1e293b;
+  }
+
+  .question-book-form__input,
+  .form-field input,
+  .form-field textarea {
+    border-color: #475569;
+  }
+
+  .reading-details {
     border-color: #1e293b;
   }
 }
