@@ -1,22 +1,24 @@
-FROM node:24-alpine AS development-dependencies-env
-COPY . /app
-WORKDIR /app
-RUN npm ci
+FROM node:24-alpine AS build
 
-FROM node:24-alpine AS production-dependencies-env
-COPY ./package.json package-lock.json /app/
 WORKDIR /app
-RUN npm ci --omit=dev
+RUN corepack enable
 
-FROM node:24-alpine AS build-env
-COPY . /app/
-COPY --from=development-dependencies-env /app/node_modules /app/node_modules
-WORKDIR /app
-RUN npm run build
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/web/package.json apps/web/package.json
+RUN pnpm install --frozen-lockfile
+
+COPY apps/web apps/web
+RUN pnpm --filter @kiss4da/web build
 
 FROM node:24-alpine
-COPY ./package.json package-lock.json /app/
-COPY --from=production-dependencies-env /app/node_modules /app/node_modules
-COPY --from=build-env /app/build /app/build
+
 WORKDIR /app
-CMD ["npm", "run", "start"]
+RUN corepack enable
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/web/package.json apps/web/package.json
+RUN pnpm install --filter @kiss4da/web --prod --frozen-lockfile
+
+COPY --from=build /app/apps/web/build apps/web/build
+
+CMD ["pnpm", "--filter", "@kiss4da/web", "start"]
