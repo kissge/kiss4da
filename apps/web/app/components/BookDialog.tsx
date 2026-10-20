@@ -109,10 +109,12 @@ export function BookDialog({ values, onChange, onClose, onSaved, existingBook }:
               onChange={(event) => update("author", event.target.value)}
             />
           </label>
-          <div className="form-field">
-            <span>出版日</span>
-            <p className="form-field__value">{formatPublishedDate(values.publishedAt) || "--"}</p>
-          </div>
+          {values.publishedAt && (
+            <div className="form-field">
+              <span>出版日</span>
+              <p className="form-field__value">{formatPublishedDate(values.publishedAt) || "--"}</p>
+            </div>
+          )}
           <label className="form-field">
             <span>URL</span>
             <input

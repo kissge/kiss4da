@@ -436,6 +436,90 @@ body {
   margin: 0;
 }
 
+.arrange-list {
+  margin-top: 0.25rem;
+}
+
+.arrange-list__header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.arrange-list__add {
+  align-items: center;
+  background: transparent;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  color: #2563eb;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  gap: 0.25rem;
+  padding: 0.4rem 0.7rem;
+}
+
+.arrange-list__add:hover,
+.arrange-list__add:focus-visible {
+  background: #eff6ff;
+  outline: none;
+}
+
+.arrange-list__add svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+.arrange-list__items {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.arrange-card {
+  align-items: center;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.85rem;
+  display: flex;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.85rem;
+}
+
+.arrange-card__info {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.arrange-card__info h2,
+.arrange-card__info p,
+.arrange-card__info span {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.arrange-card__info h2 {
+  font-size: 0.95rem;
+}
+
+.arrange-card__info p {
+  color: #64748b;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+}
+
+.arrange-card__info span {
+  color: #94a3b8;
+  display: block;
+  font-size: 0.75rem;
+  margin-top: 0.4rem;
+}
+
 .question-book-list__empty {
   border: 1px dashed #cbd5e1;
   border-radius: 0.75rem;
@@ -663,6 +747,16 @@ body {
   .question-book-card {
     background: #0f172a;
     border-color: #1e293b;
+  }
+
+  .arrange-card {
+    background: #0f172a;
+    border-color: #1e293b;
+  }
+
+  .arrange-list__add:hover,
+  .arrange-list__add:focus-visible {
+    background: #172554;
   }
 
   .question-book-search__heading span {
