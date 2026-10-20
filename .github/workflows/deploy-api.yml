@@ -3,7 +3,7 @@ name: Deploy API to Cloudflare Workers
 on:
   push:
     branches:
-      - main
+      - NOTmain
     paths:
       - "apps/api/**"
       - "pnpm-lock.yaml"
