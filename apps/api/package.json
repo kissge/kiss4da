@@ -13,8 +13,10 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/server.ts",
+    "deploy": "wrangler deploy",
     "start": "node dist/server.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "worker:dev": "wrangler dev"
   },
   "dependencies": {
     "@hono/node-server": "^2.1.5",
@@ -25,6 +27,7 @@
   "devDependencies": {
     "@types/node": "^22",
     "tsx": "^4.23.15",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "wrangler": "^4.151.2"
   }
 }

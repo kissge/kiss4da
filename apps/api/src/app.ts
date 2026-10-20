@@ -3,13 +3,23 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+export type ApiBindings = {
+  ALLOWED_ORIGINS?: string;
+};
+
 const booksQuerySchema = z.object({
   q: z.string().optional().default(""),
 });
 
-const app = new Hono()
+const app = new Hono<{ Bindings: ApiBindings }>()
   .use("*", cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: (origin, c) => {
+      const allowedOrigins = (
+        c.env.ALLOWED_ORIGINS ?? "http://localhost:5173,http://localhost:3000"
+      ).split(",");
+
+      return allowedOrigins.includes(origin) ? origin : null;
+    },
   }))
   .get(
   "/books",

@@ -7,3 +7,5 @@ node_modules/
 build/
 /apps/*/build/
 /apps/*/dist/
+/apps/api/.dev.vars
+/apps/api/.wrangler/
