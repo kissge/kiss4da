@@ -319,6 +319,14 @@ body {
   transform: translateY(1px);
 }
 
+.question-book-form__button:disabled {
+  background: #cbd5e1;
+  color: #64748b;
+  cursor: not-allowed;
+  opacity: 1;
+  transform: none;
+}
+
 .reading-details {
   border-bottom: 1px solid #e2e8f0;
   border-top: 1px solid #e2e8f0;

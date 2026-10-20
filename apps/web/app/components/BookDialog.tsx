@@ -111,7 +111,7 @@ export function BookDialog({ values, onChange, onClose, onSaved, existingBook }:
           </label>
           <div className="form-field">
             <span>出版日</span>
-            <p className="form-field__value">{formatPublishedDate(values.publishedAt)}</p>
+            <p className="form-field__value">{formatPublishedDate(values.publishedAt) || "--"}</p>
           </div>
           <label className="form-field">
             <span>URL</span>
@@ -192,7 +192,11 @@ export function BookDialog({ values, onChange, onClose, onSaved, existingBook }:
               onChange={(event) => update("comment", event.target.value)}
             />
           </label>
-          <button type="submit" className="question-book-form__button">
+          <button
+            type="submit"
+            className="question-book-form__button"
+            disabled={!values.title.trim()}
+          >
             {existingBook ? "更新" : "自分の本棚に追加"}
           </button>
         </form>
