@@ -20,13 +20,18 @@ export default function Home() {
   const [searchError, setSearchError] = useState<string | null>(null);
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
   const [formValues, setFormValues] = useState<BookFormValues | null>(null);
+  const [editingBook, setEditingBook] = useState<SavedBook | null>(null);
   const [savedBooks, setSavedBooks] = useState<SavedBook[]>([]);
   const [storageError, setStorageError] = useState<string | null>(null);
 
-  const closeDialog = () => setFormValues(null);
+  const closeDialog = () => {
+    setFormValues(null);
+    setEditingBook(null);
+  };
 
   const openDialog = (book?: Book) => {
     setIsSuggestionsOpen(false);
+    setEditingBook(null);
     setFormValues({
       id: book?.id ?? "",
       title: book?.title ?? query,
@@ -41,6 +46,12 @@ export default function Home() {
       readRange: "",
       comment: "",
     });
+  };
+
+  const openEditDialog = (book: SavedBook) => {
+    setIsSuggestionsOpen(false);
+    setEditingBook(book);
+    setFormValues(book);
   };
 
   const refreshSavedBooks = () => {
@@ -193,7 +204,7 @@ export default function Home() {
           {storageError}
         </p>
       )}
-      <QuestionBookList books={savedBooks} />
+      <QuestionBookList books={savedBooks} onSelect={openEditDialog} />
 
       {formValues && (
         <BookDialog
@@ -201,6 +212,7 @@ export default function Home() {
           onChange={setFormValues}
           onClose={closeDialog}
           onSaved={refreshSavedBooks}
+          existingBook={editingBook ?? undefined}
         />
       )}
     </section>

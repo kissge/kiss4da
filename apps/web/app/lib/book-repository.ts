@@ -26,3 +26,28 @@ export function saveBook(values: BookFormValues): SavedBook {
 
   return savedBook;
 }
+
+export function updateBook(localId: string, values: BookFormValues): SavedBook {
+  const database = readDatabase();
+  const currentBook = database.books.find((book) => book.localId === localId);
+
+  if (!currentBook) {
+    throw new Error("更新対象の問題集が見つかりませんでした。");
+  }
+
+  const updatedBook: SavedBook = {
+    ...values,
+    localId,
+    createdAt: currentBook.createdAt,
+    updatedAt: new Date().toISOString(),
+  };
+
+  writeDatabase({
+    ...database,
+    books: database.books.map((book) =>
+      book.localId === localId ? updatedBook : book,
+    ),
+  });
+
+  return updatedBook;
+}

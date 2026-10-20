@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
-import { saveBook } from "../lib/book-repository";
-import type { BookFormValues } from "../lib/types";
+import { saveBook, updateBook } from "../lib/book-repository";
+import type { BookFormValues, SavedBook } from "../lib/types";
 
 type BookDialogProps = {
   values: BookFormValues;
   onChange: (values: BookFormValues) => void;
   onClose: () => void;
   onSaved: () => void;
+  existingBook?: SavedBook;
 };
 
 function formatPublishedDate(value: string) {
@@ -19,7 +20,13 @@ function formatPublishedDate(value: string) {
   return new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(date);
 }
 
-export function BookDialog({ values, onChange, onClose, onSaved }: BookDialogProps) {
+export function BookDialog({
+  values,
+  onChange,
+  onClose,
+  onSaved,
+  existingBook,
+}: BookDialogProps) {
   const [saveError, setSaveError] = useState<string | null>(null);
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -52,13 +59,19 @@ export function BookDialog({ values, onChange, onClose, onSaved }: BookDialogPro
         <button type="button" className="book-dialog__close" aria-label="ダイアログを閉じる" onClick={onClose}>
           ×
         </button>
-        <h2 id="book-dialog-title">問題集を追加</h2>
+        <h2 id="book-dialog-title">
+          {existingBook ? "問題集を編集" : "問題集を追加"}
+        </h2>
         <form
           className="book-dialog__form"
           onSubmit={(event) => {
             event.preventDefault();
             try {
-              saveBook(values);
+              if (existingBook) {
+                updateBook(existingBook.localId, values);
+              } else {
+                saveBook(values);
+              }
               onSaved();
               onClose();
             } catch (error) {
@@ -146,7 +159,9 @@ export function BookDialog({ values, onChange, onClose, onSaved }: BookDialogPro
             <span>コメント</span>
             <textarea name="comment" rows={4} value={values.comment} onChange={(event) => update("comment", event.target.value)} />
           </label>
-          <button type="submit" className="question-book-form__button">自分の本棚に追加</button>
+          <button type="submit" className="question-book-form__button">
+            {existingBook ? "更新" : "自分の本棚に追加"}
+          </button>
         </form>
       </div>
     </div>
