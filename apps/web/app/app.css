@@ -468,6 +468,16 @@ body {
   width: 100%;
 }
 
+.question-book-card__link {
+  align-items: flex-start;
+  color: inherit;
+  display: flex;
+  flex: 1 1 0;
+  gap: 0.75rem;
+  min-width: 0;
+  text-decoration: none;
+}
+
 .question-book-card:hover,
 .question-book-card:focus-visible {
   border-color: #bfdbfe;
@@ -537,6 +547,29 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.question-book-card__edit {
+  background: transparent;
+  border: 0;
+  border-radius: 0.5rem;
+  color: #64748b;
+  cursor: pointer;
+  flex: 0 0 auto;
+  padding: 0.25rem;
+}
+
+.question-book-card__edit:hover,
+.question-book-card__edit:focus-visible {
+  background: #eff6ff;
+  color: #2563eb;
+  outline: none;
+}
+
+.question-book-card__edit svg {
+  display: block;
+  height: 1.1rem;
+  width: 1.1rem;
 }
 
 .reading-status-badge {
