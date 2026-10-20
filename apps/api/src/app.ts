@@ -5,6 +5,7 @@ import { z } from "zod";
 
 export type ApiBindings = {
   ALLOWED_ORIGINS?: string;
+  Database?: D1Database;
 };
 
 const booksQuerySchema = z.object({

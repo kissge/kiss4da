@@ -12,6 +12,9 @@
   },
   "scripts": {
     "build": "tsc",
+    "db:create": "wrangler d1 create kiss4da",
+    "db:migrate:local": "wrangler d1 migrations apply kiss4da --local",
+    "db:migrate:remote": "wrangler d1 migrations apply kiss4da --remote",
     "dev": "tsx watch src/server.ts",
     "deploy": "wrangler deploy",
     "start": "node dist/server.js",
@@ -25,6 +28,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261019.1",
     "@types/node": "^22",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",

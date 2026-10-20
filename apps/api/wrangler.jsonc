@@ -1,9 +1,19 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "kiss4da-api",
-  "main": "src/worker.ts",
-  "compatibility_date": "2026-10-20",
-  "vars": {
-    "ALLOWED_ORIGINS": "http://localhost:5173,http://localhost:3000"
-  }
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "kiss4da-api",
+	"main": "src/worker.ts",
+	"compatibility_date": "2026-10-20",
+	"vars": {
+		"ALLOWED_ORIGINS": "http://localhost:5173,http://localhost:3000"
+	},
+	// Create the database with `pnpm --filter @kiss4da/api db:create`, then
+	// replace the placeholder with the returned database_id.
+	"d1_databases": [
+		{
+			"binding": "Database",
+			"database_name": "kiss4da",
+			"database_id": "9648ec02-76f7-4db1-a6d9-58a407973495",
+			"migrations_dir": "migrations"
+		}
+	]
 }
