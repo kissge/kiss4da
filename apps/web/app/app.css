@@ -8,7 +8,7 @@
 
 html,
 body {
-  @apply bg-white text-gray-950;
+  @apply bg-slate-50 text-gray-950;
   margin: 0;
   min-width: 320px;
 
@@ -34,7 +34,11 @@ body {
   box-sizing: border-box;
   margin: 0 auto;
   max-width: 42rem;
-  padding: 2.5rem 1.25rem;
+  padding: 2.25rem 1.25rem 3rem;
+}
+
+.page-header {
+  padding: 0 0.25rem;
 }
 
 .page__eyebrow {
@@ -54,8 +58,36 @@ body {
 
 .page__description {
   color: #64748b;
+  font-size: 0.9rem;
   line-height: 1.7;
-  margin: 1rem 0 0;
+  margin: 0.7rem 0 0;
+}
+
+.question-book-search {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  box-shadow: 0 0.75rem 2rem rgb(15 23 42 / 0.05);
+  padding: 1rem;
+}
+
+.question-book-search__heading {
+  align-items: baseline;
+  display: flex;
+  gap: 0.6rem;
+  justify-content: space-between;
+  margin: 0 0 0.75rem;
+}
+
+.question-book-search__heading h2 {
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.question-book-search__heading span {
+  color: #94a3b8;
+  font-size: 0.72rem;
 }
 
 .sr-only {
@@ -70,14 +102,13 @@ body {
 .question-book-form {
   display: flex;
   gap: 0.6rem;
-  margin-top: 2rem;
 }
 
 .question-book-form__input,
 .form-field input,
 .form-field textarea {
-  background: transparent;
-  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  border: 1px solid #dbe3ed;
   border-radius: 0.65rem;
   box-sizing: border-box;
   color: inherit;
@@ -246,13 +277,26 @@ body {
 }
 
 .question-book-form__button {
-  background: #2563eb;
+  background: #1d4ed8;
   border: 0;
   border-radius: 0.65rem;
   color: white;
+  cursor: pointer;
   font: inherit;
   font-weight: 700;
   padding: 0.75rem 1.1rem;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+  white-space: nowrap;
+}
+
+.question-book-form__button:hover {
+  background: #1e40af;
+}
+
+.question-book-form__button:active {
+  transform: translateY(1px);
 }
 
 .reading-details {
@@ -354,11 +398,13 @@ body {
 }
 
 .question-book-list {
-  margin-top: 2rem;
+  margin-top: 2.5rem;
 }
 
 .section-title {
-  font-size: 1.1rem;
+  color: #334155;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
   margin: 0;
 }
 
@@ -384,22 +430,31 @@ body {
 .question-book-card {
   align-items: center;
   border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
-  background: transparent;
+  border-radius: 0.85rem;
+  background: white;
   color: inherit;
   cursor: pointer;
   display: flex;
   font: inherit;
   gap: 0.75rem;
-  padding: 0.65rem;
+  padding: 0.75rem;
   text-align: left;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
   width: 100%;
 }
 
 .question-book-card:hover,
 .question-book-card:focus-visible {
-  border-color: #2563eb;
+  border-color: #bfdbfe;
+  box-shadow: 0 0.5rem 1.25rem rgb(15 23 42 / 0.06);
   outline: none;
+}
+
+.question-book-card:active {
+  transform: translateY(1px);
 }
 
 .question-book-card__thumbnail {
@@ -505,6 +560,11 @@ body {
 }
 
 @media (prefers-color-scheme: dark) {
+  html,
+  body {
+    @apply bg-gray-950;
+  }
+
   .page__eyebrow,
   .page__description,
   .question-book-list__empty {
@@ -516,19 +576,26 @@ body {
     border-color: #1e293b;
   }
 
+  .question-book-search,
+  .question-book-card {
+    background: #0f172a;
+    border-color: #1e293b;
+  }
+
+  .question-book-search__heading span {
+    color: #64748b;
+  }
+
   .question-book-form__input,
   .form-field input,
   .form-field textarea {
+    background: #111c2f;
     border-color: #475569;
   }
 
   .question-book-suggestions {
     background: #0f172a;
     border-color: #475569;
-  }
-
-  .question-book-card {
-    border-color: #1e293b;
   }
 
   .book-dialog {

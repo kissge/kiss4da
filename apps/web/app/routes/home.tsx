@@ -114,72 +114,78 @@ export default function Home() {
 
   return (
     <section className="page">
-      <form className="question-book-form" onSubmit={(event) => event.preventDefault()}>
-        <label className="sr-only" htmlFor="question-book-search">
-          問題集を検索
-        </label>
-        <div className="question-book-combobox">
-          <input
-            id="question-book-search"
-            name="questionBook"
-            role="combobox"
-            aria-autocomplete="list"
-            aria-controls="question-book-suggestions"
-            aria-expanded={isSuggestionsOpen}
-            type="text"
-            placeholder="問題集を検索"
-            className="question-book-form__input"
-            autoComplete="off"
-            value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
-              setIsSuggestionsOpen(true);
-            }}
-            onFocus={() => setIsSuggestionsOpen(Boolean(query.trim()))}
-          />
-          {isSuggestionsOpen && query.trim() && (
-            <div
-              id="question-book-suggestions"
-              className="question-book-suggestions"
-              role="listbox"
-            >
-              {isSearching && <p className="question-book-suggestions__status">検索中...</p>}
-              {searchError && (
-                <p className="question-book-suggestions__status question-book-suggestions__status--error">
-                  {searchError}
-                </p>
-              )}
-              {!isSearching && !searchError && books.length === 0 && (
-                <p className="question-book-suggestions__status">該当する問題集はありません。</p>
-              )}
-              {!isSearching &&
-                !searchError &&
-                books.map((book) => (
-                  <button
-                    key={book.id}
-                    type="button"
-                    className="question-book-suggestion"
-                    role="option"
-                    onClick={() => openDialog(book)}
-                  >
-                    <img
-                      src={book.thumbnailURL}
-                      alt=""
-                      className="question-book-suggestion__thumbnail"
-                    />
-                    <span className="question-book-suggestion__info">
-                      <strong>{book.title}</strong>
-                      <span>{book.author}</span>
-                    </span>
-                  </button>
-                ))}
-            </div>
-          )}
+      <div className="question-book-search">
+        <div className="question-book-search__heading">
+          <h2>問題集を追加</h2>
+          <span>タイトルや著者名で検索</span>
         </div>
-        <button type="button" className="question-book-form__button" onClick={() => openDialog()}>
-          追加
-        </button>
-      </form>
+        <form className="question-book-form" onSubmit={(event) => event.preventDefault()}>
+          <label className="sr-only" htmlFor="question-book-search">
+            問題集を検索
+          </label>
+          <div className="question-book-combobox">
+            <input
+              id="question-book-search"
+              name="questionBook"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-controls="question-book-suggestions"
+              aria-expanded={isSuggestionsOpen}
+              type="text"
+              placeholder="問題集を検索"
+              className="question-book-form__input"
+              autoComplete="off"
+              value={query}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setIsSuggestionsOpen(true);
+              }}
+              onFocus={() => setIsSuggestionsOpen(Boolean(query.trim()))}
+            />
+            {isSuggestionsOpen && query.trim() && (
+              <div
+                id="question-book-suggestions"
+                className="question-book-suggestions"
+                role="listbox"
+              >
+                {isSearching && <p className="question-book-suggestions__status">検索中...</p>}
+                {searchError && (
+                  <p className="question-book-suggestions__status question-book-suggestions__status--error">
+                    {searchError}
+                  </p>
+                )}
+                {!isSearching && !searchError && books.length === 0 && (
+                  <p className="question-book-suggestions__status">見つかりません（追加は可能）</p>
+                )}
+                {!isSearching &&
+                  !searchError &&
+                  books.map((book) => (
+                    <button
+                      key={book.id}
+                      type="button"
+                      className="question-book-suggestion"
+                      role="option"
+                      onClick={() => openDialog(book)}
+                    >
+                      <img
+                        src={book.thumbnailURL}
+                        alt=""
+                        className="question-book-suggestion__thumbnail"
+                      />
+                      <span className="question-book-suggestion__info">
+                        <strong>{book.title}</strong>
+                        <span>{book.author}</span>
+                      </span>
+                    </button>
+                  ))}
+              </div>
+            )}
+          </div>
+          <button type="button" className="question-book-form__button" onClick={() => openDialog()}>
+            追加
+          </button>
+        </form>
+      </div>
 
       {storageError && (
         <p className="form-error" role="alert">
