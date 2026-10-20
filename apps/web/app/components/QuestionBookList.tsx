@@ -27,7 +27,7 @@ export function QuestionBookList({ books, onSelect }: QuestionBookListProps) {
   return (
     <section className="question-book-list" aria-labelledby="question-book-list-title">
       <h2 id="question-book-list-title" className="section-title">
-        自分の本棚
+        自分の本棚（全{sortedBooks.length}件）
       </h2>
       {sortedBooks.length === 0 ? (
         <div className="question-book-list__empty" aria-live="polite">
