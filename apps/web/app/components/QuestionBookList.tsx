@@ -22,9 +22,7 @@ function formatReadDate(value: string) {
 }
 
 export function QuestionBookList({ books, onSelect }: QuestionBookListProps) {
-  const sortedBooks = [...books].sort(
-    (a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt),
-  );
+  const sortedBooks = [...books].sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt));
 
   return (
     <section className="question-book-list" aria-labelledby="question-book-list-title">
@@ -44,11 +42,7 @@ export function QuestionBookList({ books, onSelect }: QuestionBookListProps) {
               type="button"
               onClick={() => onSelect(book)}
             >
-              <img
-                src={book.thumbnailURL}
-                alt=""
-                className="question-book-card__thumbnail"
-              />
+              <img src={book.thumbnailURL} alt="" className="question-book-card__thumbnail" />
               <div className="question-book-card__info">
                 <h3>{book.title}</h3>
                 <p>{book.author}</p>

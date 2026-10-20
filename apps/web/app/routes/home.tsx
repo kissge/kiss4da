@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
-import type { Route } from "./+types/home";
+
 import { BookDialog } from "../components/BookDialog";
 import { QuestionBookList } from "../components/QuestionBookList";
 import { apiClient } from "../lib/apiClient";
 import { listSavedBooks } from "../lib/book-repository";
 import type { Book, BookFormValues, SavedBook } from "../lib/types";
 
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "問題集管理" },
-    { name: "description", content: "問題集を管理します。" },
-  ];
+export function meta() {
+  return [{ title: "問題集管理" }, { name: "description", content: "問題集を管理します。" }];
 }
 
 export default function Home() {
@@ -60,9 +57,7 @@ export default function Home() {
       setStorageError(null);
     } catch (error) {
       setStorageError(
-        error instanceof Error
-          ? error.message
-          : "ローカルの保存データを読み込めませんでした。",
+        error instanceof Error ? error.message : "ローカルの保存データを読み込めませんでした。",
       );
     }
   };
@@ -105,9 +100,7 @@ export default function Home() {
         }
 
         setBooks([]);
-        setSearchError(
-          error instanceof Error ? error.message : "問題集の検索に失敗しました",
-        );
+        setSearchError(error instanceof Error ? error.message : "問題集の検索に失敗しました");
       } finally {
         setIsSearching(false);
       }
@@ -121,10 +114,7 @@ export default function Home() {
 
   return (
     <section className="page">
-      <form
-        className="question-book-form"
-        onSubmit={(event) => event.preventDefault()}
-      >
+      <form className="question-book-form" onSubmit={(event) => event.preventDefault()}>
         <label className="sr-only" htmlFor="question-book-search">
           問題集を検索
         </label>
@@ -153,18 +143,14 @@ export default function Home() {
               className="question-book-suggestions"
               role="listbox"
             >
-              {isSearching && (
-                <p className="question-book-suggestions__status">検索中...</p>
-              )}
+              {isSearching && <p className="question-book-suggestions__status">検索中...</p>}
               {searchError && (
                 <p className="question-book-suggestions__status question-book-suggestions__status--error">
                   {searchError}
                 </p>
               )}
               {!isSearching && !searchError && books.length === 0 && (
-                <p className="question-book-suggestions__status">
-                  該当する問題集はありません。
-                </p>
+                <p className="question-book-suggestions__status">該当する問題集はありません。</p>
               )}
               {!isSearching &&
                 !searchError &&
@@ -190,11 +176,7 @@ export default function Home() {
             </div>
           )}
         </div>
-        <button
-          type="button"
-          className="question-book-form__button"
-          onClick={() => openDialog()}
-        >
+        <button type="button" className="question-book-form__button" onClick={() => openDialog()}>
           追加
         </button>
       </form>

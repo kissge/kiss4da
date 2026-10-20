@@ -14,10 +14,17 @@
     "api:start": "pnpm --filter @kiss4da/api start",
     "api:typecheck": "pnpm --filter @kiss4da/api typecheck",
     "api:worker:dev": "pnpm --filter @kiss4da/api worker:dev",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "lint": "oxlint .",
     "web:build": "pnpm --filter @kiss4da/web build",
     "web:dev": "pnpm --filter @kiss4da/web dev",
     "web:start": "pnpm --filter @kiss4da/web start",
     "web:typecheck": "pnpm --filter @kiss4da/web typecheck"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.74.0",
+    "oxlint": "^1.89.0"
   },
   "packageManager": "pnpm@10.15.1"
 }

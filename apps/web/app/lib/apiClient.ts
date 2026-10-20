@@ -1,6 +1,5 @@
-import { hc } from "hono/client";
-
 import type { AppType } from "@kiss4da/api";
+import { hc } from "hono/client";
 
 const defaultApiUrl = import.meta.env.DEV ? "http://localhost:8787/" : "/";
 

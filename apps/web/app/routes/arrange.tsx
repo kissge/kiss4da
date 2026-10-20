@@ -1,6 +1,4 @@
-import type { Route } from "./+types/arrange";
-
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [
     { title: "日程調整 | 問題集管理" },
     { name: "description", content: "日程を調整します。" },

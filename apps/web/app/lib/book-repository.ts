@@ -1,5 +1,5 @@
-import type { BookFormValues, SavedBook } from "./types";
 import { readDatabase, writeDatabase } from "./storage";
+import type { BookFormValues, SavedBook } from "./types";
 
 function createLocalId(): string {
   return globalThis.crypto?.randomUUID() ?? `${Date.now()}-${Math.random()}`;
@@ -44,9 +44,7 @@ export function updateBook(localId: string, values: BookFormValues): SavedBook {
 
   writeDatabase({
     ...database,
-    books: database.books.map((book) =>
-      book.localId === localId ? updatedBook : book,
-    ),
+    books: database.books.map((book) => (book.localId === localId ? updatedBook : book)),
   });
 
   return updatedBook;
