@@ -102,6 +102,7 @@ body {
 .question-book-form {
   display: flex;
   gap: 0.6rem;
+  position: relative;
 }
 
 .question-book-form__input,
@@ -125,7 +126,6 @@ body {
 .question-book-combobox {
   flex: 1;
   min-width: 0;
-  position: relative;
 }
 
 .question-book-combobox .question-book-form__input {
@@ -139,15 +139,16 @@ body {
   box-shadow: 0 0.5rem 1.5rem rgb(15 23 42 / 0.12);
   left: 0;
   max-height: 18rem;
+  max-width: 100%;
   overflow-y: auto;
   position: absolute;
-  right: 0;
   top: calc(100% + 0.4rem);
+  width: 100%;
   z-index: 5;
 }
 
 .question-book-suggestion {
-  align-items: center;
+  align-items: flex-start;
   background: transparent;
   border: 0;
   color: inherit;
@@ -193,7 +194,14 @@ body {
   padding: 0.25rem 0.5rem;
 }
 
-.question-book-suggestion__info strong,
+.question-book-suggestion__info strong {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
 .question-book-suggestion__info span {
   overflow: hidden;
   text-overflow: ellipsis;
