@@ -291,6 +291,12 @@ body {
   resize: vertical;
 }
 
+.form-error {
+  color: #b91c1c;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
 .reading-status {
   border: 0;
   margin: 0;

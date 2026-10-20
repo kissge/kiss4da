@@ -3,7 +3,8 @@ import type { Route } from "./+types/home";
 import { BookDialog } from "../components/BookDialog";
 import { QuestionBookList } from "../components/QuestionBookList";
 import { apiClient } from "../lib/apiClient";
-import type { Book, BookFormValues } from "../lib/types";
+import { listSavedBooks } from "../lib/book-repository";
+import type { Book, BookFormValues, SavedBook } from "../lib/types";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -19,6 +20,8 @@ export default function Home() {
   const [searchError, setSearchError] = useState<string | null>(null);
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
   const [formValues, setFormValues] = useState<BookFormValues | null>(null);
+  const [savedBooks, setSavedBooks] = useState<SavedBook[]>([]);
+  const [storageError, setStorageError] = useState<string | null>(null);
 
   const closeDialog = () => setFormValues(null);
 
@@ -39,6 +42,23 @@ export default function Home() {
       comment: "",
     });
   };
+
+  const refreshSavedBooks = () => {
+    try {
+      setSavedBooks(listSavedBooks());
+      setStorageError(null);
+    } catch (error) {
+      setStorageError(
+        error instanceof Error
+          ? error.message
+          : "ローカルの保存データを読み込めませんでした。",
+      );
+    }
+  };
+
+  useEffect(() => {
+    refreshSavedBooks();
+  }, []);
 
   useEffect(() => {
     const trimmedQuery = query.trim();
@@ -168,13 +188,19 @@ export default function Home() {
         </button>
       </form>
 
-      <QuestionBookList />
+      {storageError && (
+        <p className="form-error" role="alert">
+          {storageError}
+        </p>
+      )}
+      <QuestionBookList books={savedBooks} />
 
       {formValues && (
         <BookDialog
           values={formValues}
           onChange={setFormValues}
           onClose={closeDialog}
+          onSaved={refreshSavedBooks}
         />
       )}
     </section>

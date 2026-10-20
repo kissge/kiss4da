@@ -15,3 +15,9 @@ export type BookFormValues = Book & {
   readRange: string;
   comment: string;
 };
+
+export type SavedBook = BookFormValues & {
+  localId: string;
+  createdAt: string;
+  updatedAt: string;
+};

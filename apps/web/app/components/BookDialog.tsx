@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { saveBook } from "../lib/book-repository";
 import type { BookFormValues } from "../lib/types";
 
 type BookDialogProps = {
   values: BookFormValues;
   onChange: (values: BookFormValues) => void;
   onClose: () => void;
+  onSaved: () => void;
 };
 
 function formatPublishedDate(value: string) {
@@ -17,7 +19,8 @@ function formatPublishedDate(value: string) {
   return new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(date);
 }
 
-export function BookDialog({ values, onChange, onClose }: BookDialogProps) {
+export function BookDialog({ values, onChange, onClose, onSaved }: BookDialogProps) {
+  const [saveError, setSaveError] = useState<string | null>(null);
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -54,9 +57,24 @@ export function BookDialog({ values, onChange, onClose }: BookDialogProps) {
           className="book-dialog__form"
           onSubmit={(event) => {
             event.preventDefault();
-            onClose();
+            try {
+              saveBook(values);
+              onSaved();
+              onClose();
+            } catch (error) {
+              setSaveError(
+                error instanceof Error
+                  ? error.message
+                  : "問題集の保存に失敗しました。",
+              );
+            }
           }}
         >
+          {saveError && (
+            <p className="form-error" role="alert">
+              {saveError}
+            </p>
+          )}
           <div className="book-dialog__thumbnail-field">
             {values.thumbnailURL && (
               <img src={values.thumbnailURL} alt={`${values.title}のサムネイル`} className="book-dialog__thumbnail" />
