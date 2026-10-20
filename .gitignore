@@ -6,3 +6,4 @@ node_modules/
 .react-router/
 build/
 /apps/*/build/
+/apps/*/dist/

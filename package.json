@@ -2,10 +2,18 @@
   "name": "kiss4da",
   "private": true,
   "scripts": {
-    "build": "pnpm --filter @kiss4da/web build",
-    "dev": "pnpm --filter @kiss4da/web dev",
-    "start": "pnpm --filter @kiss4da/web start",
-    "typecheck": "pnpm --filter @kiss4da/web typecheck"
+    "build": "pnpm build",
+    "dev": "pnpm dev",
+    "start": "pnpm start",
+    "typecheck": "pnpm typecheck",
+    "api:build": "pnpm --filter @kiss4da/api build",
+    "api:dev": "pnpm --filter @kiss4da/api dev",
+    "api:start": "pnpm --filter @kiss4da/api start",
+    "api:typecheck": "pnpm --filter @kiss4da/api typecheck",
+    "web:build": "pnpm --filter @kiss4da/web build",
+    "web:dev": "pnpm --filter @kiss4da/web dev",
+    "web:start": "pnpm --filter @kiss4da/web start",
+    "web:typecheck": "pnpm --filter @kiss4da/web typecheck"
   },
   "packageManager": "pnpm@10.15.1"
 }
