@@ -177,8 +177,20 @@ body {
 
 .question-book-suggestion__info {
   display: grid;
+  flex: 1;
   gap: 0.25rem;
   min-width: 0;
+}
+
+.question-book-suggestion__badge {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  color: #1d4ed8;
+  flex: 0 0 auto;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
 }
 
 .question-book-suggestion__info strong,
@@ -605,6 +617,12 @@ body {
   .question-book-suggestion:hover,
   .question-book-suggestion:focus-visible {
     background: #1e293b;
+  }
+
+  .question-book-suggestion__badge {
+    background: #172554;
+    border-color: #1e40af;
+    color: #bfdbfe;
   }
 
   .reading-details {

@@ -51,6 +51,17 @@ export default function Home() {
     setFormValues(book);
   };
 
+  const openBookDialog = (book: Book) => {
+    const savedBook = savedBooks.find((saved) => saved.id === book.id);
+
+    if (savedBook) {
+      openEditDialog(savedBook);
+      return;
+    }
+
+    openDialog(book);
+  };
+
   const refreshSavedBooks = () => {
     try {
       setSavedBooks(listSavedBooks());
@@ -159,25 +170,30 @@ export default function Home() {
                 )}
                 {!isSearching &&
                   !searchError &&
-                  books.map((book) => (
-                    <button
-                      key={book.id}
-                      type="button"
-                      className="question-book-suggestion"
-                      role="option"
-                      onClick={() => openDialog(book)}
-                    >
-                      <img
-                        src={book.thumbnailURL}
-                        alt=""
-                        className="question-book-suggestion__thumbnail"
-                      />
-                      <span className="question-book-suggestion__info">
-                        <strong>{book.title}</strong>
-                        <span>{book.author}</span>
-                      </span>
-                    </button>
-                  ))}
+                  books.map((book) => {
+                    const isSaved = savedBooks.some((savedBook) => savedBook.id === book.id);
+
+                    return (
+                      <button
+                        key={book.id}
+                        type="button"
+                        className="question-book-suggestion"
+                        role="option"
+                        onClick={() => openBookDialog(book)}
+                      >
+                        <img
+                          src={book.thumbnailURL}
+                          alt=""
+                          className="question-book-suggestion__thumbnail"
+                        />
+                        <span className="question-book-suggestion__info">
+                          <strong>{book.title}</strong>
+                          <span>{book.author}</span>
+                        </span>
+                        {isSaved && <span className="question-book-suggestion__badge">登録済</span>}
+                      </button>
+                    );
+                  })}
               </div>
             )}
           </div>
