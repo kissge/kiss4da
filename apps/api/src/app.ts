@@ -1,7 +1,10 @@
+import type { D1Database } from "@cloudflare/workers-types";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { z } from "zod";
+
+import { getDatabase } from "./db.js";
 
 export type ApiBindings = {
   ALLOWED_ORIGINS?: string;
@@ -25,40 +28,36 @@ const app = new Hono<{ Bindings: ApiBindings }>()
       },
     }),
   )
-  .get("/books", zValidator("query", booksQuerySchema), (c) => {
-    const { q: _q } = c.req.valid("query");
+  .get("/books", zValidator("query", booksQuerySchema), async (c) => {
+    const { q } = c.req.valid("query");
+    const database = getDatabase(c.env);
+    const pattern = `%${q.replaceAll("\\", "\\\\").replaceAll("%", "\\%").replaceAll("_", "\\_")}%`;
+    const { results } = await database
+      .prepare(
+        `SELECT
+           id,
+           COALESCE(title, '') AS title,
+           COALESCE(author, '') AS author,
+           COALESCE(published_at, '') AS publishedAt,
+           COALESCE(description, '') AS description,
+           COALESCE(url, '') AS url,
+           COALESCE(thumbnail_url, '') AS thumbnailURL
+         FROM books
+         WHERE title LIKE ? ESCAPE '\\' OR author LIKE ? ESCAPE '\\'
+         ORDER BY updated_at DESC`,
+      )
+      .bind(pattern, pattern)
+      .all<{
+        id: string;
+        title: string;
+        author: string;
+        publishedAt: string;
+        description: string;
+        url: string;
+        thumbnailURL: string;
+      }>();
 
-    return c.json({
-      results: [
-        {
-          id: "abcdefgh",
-          title: "Book 1",
-          author: "Author 1",
-          publishedAt: "2022-01-01 12:00:00",
-          description: "This is Book 1",
-          url: "https://example.com/book1",
-          thumbnailURL: "https://placehold.jp/150x225.png",
-        },
-        {
-          id: "ijklmnop",
-          title: "Book 2",
-          author: "Author 2",
-          publishedAt: "2022-02-01 12:00:00",
-          description: "This is Book 2",
-          url: "https://example.com/book2",
-          thumbnailURL: "https://placehold.jp/150x225.png",
-        },
-        {
-          id: "qrstuvwx",
-          title: "Book 3",
-          author: "Author 3",
-          publishedAt: "2022-03-01 12:00:00",
-          description: "This is Book 3",
-          url: "https://example.com/book3",
-          thumbnailURL: "https://placehold.jp/150x225.png",
-        },
-      ],
-    });
+    return c.json({ results });
   });
 
 export { app, booksQuerySchema };
