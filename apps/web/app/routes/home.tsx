@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { BookDialog } from "../components/BookDialog";
 import { QuestionBookList } from "../components/QuestionBookList";
 import { apiClient } from "../lib/apiClient";
-import { listSavedBooks } from "../lib/book-repository";
+import { listSavedBooks } from "../lib/bookRepository";
 import type { Book, BookFormValues, SavedBook } from "../lib/types";
 
 export function meta() {

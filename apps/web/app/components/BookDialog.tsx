@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { saveBook, updateBook } from "../lib/book-repository";
+import { saveBook, updateBook } from "../lib/bookRepository";
 import type { BookFormValues, SavedBook } from "../lib/types";
 
 type BookDialogProps = {
