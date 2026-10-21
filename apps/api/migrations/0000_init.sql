@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS arrangements (
   organizer_name TEXT NOT NULL,
   held_on TEXT,
   description TEXT NOT NULL DEFAULT '',
+  organizer_user_id TEXT NOT NULL DEFAULT '',
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
@@ -51,9 +52,11 @@ CREATE TABLE IF NOT EXISTS arrangement_participants (
   participant_id TEXT PRIMARY KEY NOT NULL,
   arrangement_id TEXT NOT NULL,
   participant_name TEXT NOT NULL,
+  user_id TEXT NOT NULL DEFAULT '',
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
   UNIQUE (arrangement_id, participant_name),
+  UNIQUE (arrangement_id, user_id),
   FOREIGN KEY (arrangement_id) REFERENCES arrangements (id) ON DELETE CASCADE
 );
 

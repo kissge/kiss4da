@@ -6,6 +6,7 @@ import { apiClient } from "../lib/apiClient";
 import { saveArrangement } from "../lib/arrangementRepository";
 import { listSavedBooks, saveBook, updateBook as updateSavedBook } from "../lib/bookRepository";
 import { formatDateForDisplay } from "../lib/date";
+import { getOrCreateInternalId } from "../lib/internalId";
 import type { BookFormValues, ReadingStatus, SavedBook } from "../lib/types";
 
 type Arrangement = Awaited<ReturnType<typeof fetchArrangement>>;
@@ -100,6 +101,7 @@ export default function ArrangeParticipate() {
         param: { id: arrangement.id },
         json: {
           participantName: participantName.trim(),
+          participantUserId: getOrCreateInternalId(),
           books: books.map((book) => ({
             id: book.id,
             readingStatus: book.readingStatus,

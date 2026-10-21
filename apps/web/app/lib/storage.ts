@@ -3,12 +3,13 @@ const DATABASE_VERSION = 1;
 
 export type LocalDatabase = {
   version: typeof DATABASE_VERSION;
+  internalId: string;
   books: import("./types").SavedBook[];
   arrangements: import("./types").SavedArrangement[];
 };
 
 function emptyDatabase(): LocalDatabase {
-  return { version: DATABASE_VERSION, books: [], arrangements: [] };
+  return { version: DATABASE_VERSION, internalId: "", books: [], arrangements: [] };
 }
 
 function isLocalDatabase(value: unknown): value is LocalDatabase {
@@ -20,6 +21,7 @@ function isLocalDatabase(value: unknown): value is LocalDatabase {
   return (
     database.version === DATABASE_VERSION &&
     Array.isArray(database.books) &&
+    (database.internalId === undefined || typeof database.internalId === "string") &&
     (database.arrangements === undefined || Array.isArray(database.arrangements))
   );
 }
@@ -47,6 +49,7 @@ export function readDatabase(): LocalDatabase {
 
   return {
     ...parsed,
+    internalId: parsed.internalId ?? "",
     arrangements: parsed.arrangements ?? [],
   };
 }
@@ -61,4 +64,16 @@ export function writeDatabase(database: LocalDatabase): void {
   } catch {
     throw new Error("問題集をローカルに保存できませんでした。");
   }
+}
+
+export function getOrCreateInternalId(): string {
+  const database = readDatabase();
+
+  if (database.internalId) {
+    return database.internalId;
+  }
+
+  const internalId = crypto.randomUUID();
+  writeDatabase({ ...database, internalId });
+  return internalId;
 }

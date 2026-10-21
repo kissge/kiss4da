@@ -6,6 +6,7 @@ import { QuestionBookSearch } from "../components/QuestionBookSearch";
 import { apiClient } from "../lib/apiClient";
 import { saveArrangement } from "../lib/arrangementRepository";
 import { listSavedBooks } from "../lib/bookRepository";
+import { getOrCreateInternalId } from "../lib/internalId";
 import type { Book, BookFormValues, SavedBook } from "../lib/types";
 
 export function meta() {
@@ -95,6 +96,7 @@ export default function ArrangeNew() {
         json: {
           title: arrangementName.trim(),
           organizerName: organizerName.trim(),
+          organizerUserId: getOrCreateInternalId(),
           heldOn,
           description,
           books: books.map((book, position) => ({

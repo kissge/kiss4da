@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   isRouteErrorResponse,
   Links,
@@ -11,6 +12,7 @@ import type { Route } from "./+types/root";
 
 import "./app.css";
 import { BottomTabBar } from "./components/BottomTabBar";
+import { getOrCreateInternalId } from "./lib/internalId";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -44,6 +46,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  useEffect(() => {
+    getOrCreateInternalId();
+  }, []);
+
   return (
     <div className="app-shell">
       <main className="app-content">

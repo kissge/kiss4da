@@ -28,6 +28,7 @@ const createArrangementSchema = z
   .object({
     title: z.string().trim().min(1),
     organizerName: z.string().trim().min(1),
+    organizerUserId: z.string().trim().min(1),
     heldOn: z.string().trim().optional().default(""),
     description: z.string().default(""),
     books: z.array(arrangementBookSchema).min(1),
@@ -58,6 +59,7 @@ const participateBookSchema = z.object({
 const participateArrangementSchema = z
   .object({
     participantName: z.string().trim().min(1),
+    participantUserId: z.string().trim().min(1),
     books: z.array(participateBookSchema).min(1),
   })
   .superRefine((value, context) => {
@@ -129,6 +131,7 @@ const app = new Hono<{ Bindings: ApiBindings }>()
            id,
            title,
            organizer_name AS organizerName,
+           organizer_user_id AS organizerUserId,
            held_on AS heldOn,
            description,
            created_at AS createdAt,
@@ -141,6 +144,7 @@ const app = new Hono<{ Bindings: ApiBindings }>()
         id: string;
         title: string;
         organizerName: string;
+        organizerUserId: string;
         heldOn: string | null;
         description: string;
         createdAt: string;
@@ -263,13 +267,14 @@ const app = new Hono<{ Bindings: ApiBindings }>()
       database
         .prepare(
           `INSERT INTO arrangements
-             (id, title, organizer_name, held_on, description, created_at, updated_at)
-           VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?6)`,
+             (id, title, organizer_name, organizer_user_id, held_on, description, created_at, updated_at)
+           VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?7)`,
         )
         .bind(
           arrangementId,
           input.title,
           input.organizerName,
+          input.organizerUserId,
           input.heldOn,
           input.description,
           now,
@@ -325,9 +330,10 @@ const app = new Hono<{ Bindings: ApiBindings }>()
         .prepare(
           `SELECT participant_id
            FROM arrangement_participants
-           WHERE arrangement_id = ?1 AND participant_name = ?2`,
+           WHERE arrangement_id = ?1
+             AND (participant_name = ?2 OR user_id = ?3)`,
         )
-        .bind(arrangementId, input.participantName)
+        .bind(arrangementId, input.participantName, input.participantUserId)
         .first<{ participantId: string }>();
 
       if (existingParticipant) {
@@ -374,10 +380,10 @@ const app = new Hono<{ Bindings: ApiBindings }>()
         database
           .prepare(
             `INSERT INTO arrangement_participants
-               (participant_id, arrangement_id, participant_name, created_at, updated_at)
-             VALUES (?1, ?2, ?3, ?4, ?4)`,
+               (participant_id, arrangement_id, participant_name, user_id, created_at, updated_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?5)`,
           )
-          .bind(participantId, arrangementId, input.participantName, now),
+          .bind(participantId, arrangementId, input.participantName, input.participantUserId, now),
         ...input.books.map((book) => {
           const readDate = book.readDate || null;
 
