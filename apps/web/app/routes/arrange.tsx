@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
 import { listSavedArrangements } from "../lib/arrangementRepository";
+import { formatDateOrFallback } from "../lib/date";
 import type { SavedArrangement } from "../lib/types";
 
 export function meta() {
@@ -9,20 +10,6 @@ export function meta() {
     { title: "読むやつ調整 | kiss4da" },
     { name: "description", content: "読むやつを調整します。" },
   ];
-}
-
-function formatCreatedDate(value: string) {
-  if (!value) {
-    return "開催日未定";
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "開催日未定";
-  }
-
-  return new Intl.DateTimeFormat("ja-JP", { dateStyle: "medium" }).format(date);
 }
 
 export default function Arrange() {
@@ -53,7 +40,7 @@ export default function Arrange() {
               <div className="arrange-card__info">
                 <h2>{arrangement.title}</h2>
                 <p>{arrangement.organizerName}</p>
-                <span>{formatCreatedDate(arrangement.heldOn)}</span>
+                <span>{formatDateOrFallback(arrangement.heldOn, "開催日未定")}</span>
               </div>
             </Link>
           ))}

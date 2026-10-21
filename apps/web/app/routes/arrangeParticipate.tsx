@@ -5,6 +5,7 @@ import { ParticipateBookDialog } from "../components/ParticipateBookDialog";
 import { apiClient } from "../lib/apiClient";
 import { saveArrangement } from "../lib/arrangementRepository";
 import { listSavedBooks, saveBook, updateBook as updateSavedBook } from "../lib/bookRepository";
+import { formatDateForDisplay } from "../lib/date";
 import type { BookFormValues, ReadingStatus, SavedBook } from "../lib/types";
 
 type Arrangement = Awaited<ReturnType<typeof fetchArrangement>>;
@@ -227,7 +228,7 @@ export default function ArrangeParticipate() {
                       >
                         {readingStatusLabel(book.readingStatus)}
                       </span>
-                      {book.readDate && <span>{book.readDate}</span>}
+                      {book.readDate && <span>{formatDateForDisplay(book.readDate)}</span>}
                       {book.readRange && <span>{book.readRange}</span>}
                     </div>
                   </div>

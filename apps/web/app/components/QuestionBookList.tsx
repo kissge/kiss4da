@@ -1,3 +1,4 @@
+import { formatDateForDisplay } from "../lib/date";
 import type { SavedBook } from "../lib/types";
 
 type QuestionBookListProps = {
@@ -10,16 +11,6 @@ const readingStatusLabels = {
   "partially-read": "一部既読",
   read: "既読",
 } as const;
-
-function formatReadDate(value: string) {
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(date);
-}
 
 export function QuestionBookList({ books, onSelect }: QuestionBookListProps) {
   const sortedBooks = [...books].sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt));
@@ -53,7 +44,7 @@ export function QuestionBookList({ books, onSelect }: QuestionBookListProps) {
                     >
                       {readingStatusLabels[book.readingStatus]}
                     </span>
-                    {book.readDate && <span>{formatReadDate(book.readDate)}</span>}
+                    {book.readDate && <span>{formatDateForDisplay(book.readDate)}</span>}
                     {book.readRange && <span>{book.readRange}</span>}
                   </div>
                 </div>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 
 import { apiClient } from "../lib/apiClient";
+import { formatDateOrFallback } from "../lib/date";
 
 export function meta() {
   return [
@@ -56,7 +57,9 @@ export default function ArrangeDetail() {
         <p className="page__eyebrow">ARRANGEMENT</p>
         <h1 className="page__title">{arrangement.title}</h1>
         <p className="arrange-detail__organizer">{arrangement.organizerName}</p>
-        <p className="arrange-detail__date">{arrangement.heldOn || "開催日未定"}</p>
+        <p className="arrange-detail__date">
+          {formatDateOrFallback(arrangement.heldOn ?? "", "開催日未定")}
+        </p>
         {arrangement.description && <p className="page__description">{arrangement.description}</p>}
         <Link to={`/arrange/${arrangement.id}/participate`} className="arrange-detail__participate">
           <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">

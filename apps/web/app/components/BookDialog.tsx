@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { saveBook, updateBook } from "../lib/bookRepository";
+import { formatDateForDisplay } from "../lib/date";
 import type { BookFormValues, SavedBook } from "../lib/types";
 
 type BookDialogProps = {
@@ -10,16 +11,6 @@ type BookDialogProps = {
   onSaved: () => void;
   existingBook?: SavedBook;
 };
-
-function formatPublishedDate(value: string) {
-  const date = new Date(value.includes(" ") ? value.replace(" ", "T") : value);
-
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(date);
-}
 
 export function BookDialog({ values, onChange, onClose, onSaved, existingBook }: BookDialogProps) {
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -112,7 +103,9 @@ export function BookDialog({ values, onChange, onClose, onSaved, existingBook }:
           {values.publishedAt && (
             <div className="form-field">
               <span>出版日</span>
-              <p className="form-field__value">{formatPublishedDate(values.publishedAt) || "--"}</p>
+              <p className="form-field__value">
+                {formatDateForDisplay(values.publishedAt) || "--"}
+              </p>
             </div>
           )}
           <label className="form-field">
