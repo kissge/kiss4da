@@ -3,7 +3,8 @@ import { Link, useNavigate, useParams } from "react-router";
 
 import { ParticipateBookDialog } from "../components/ParticipateBookDialog";
 import { apiClient } from "../lib/apiClient";
-import { listSavedBooks } from "../lib/bookRepository";
+import { saveArrangement } from "../lib/arrangementRepository";
+import { listSavedBooks, saveBook, updateBook as updateSavedBook } from "../lib/bookRepository";
 import type { BookFormValues, ReadingStatus, SavedBook } from "../lib/types";
 
 type Arrangement = Awaited<ReturnType<typeof fetchArrangement>>;
@@ -44,7 +45,9 @@ export default function ArrangeParticipate() {
   const [participantName, setParticipantName] = useState("");
   const [autoFilledCount, setAutoFilledCount] = useState(0);
   const [savedBookCount, setSavedBookCount] = useState(0);
-  const [reflectToBookshelf, setReflectToBookshelf] = useState(false);
+  const [reflectToBookshelf, setReflectToBookshelf] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -81,6 +84,72 @@ export default function ArrangeParticipate() {
     setEditingBook(null);
   };
 
+  const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!arrangement) {
+      return;
+    }
+
+    setSubmitError(null);
+    setIsSubmitting(true);
+
+    try {
+      const response = await apiClient.arrangements[":id"].participants.$post({
+        param: { id: arrangement.id },
+        json: {
+          participantName: participantName.trim(),
+          books: books.map((book) => ({
+            id: book.id,
+            readingStatus: book.readingStatus,
+            readRange: book.readRange,
+            readDate: book.readDate,
+          })),
+        },
+      });
+
+      if (!response.ok) {
+        const body = (await response.json()) as { message?: string };
+
+        if (response.status === 409) {
+          throw new Error(
+            body.message ??
+              "すでにこの調整に同じ名前の参加者がいます。別の名前を入力するか、既存の参加者を編集してください。",
+          );
+        }
+
+        throw new Error(body.message ?? `調整への参加に失敗しました (${response.status})`);
+      }
+
+      saveArrangement({
+        id: arrangement.id,
+        title: arrangement.title,
+        organizerName: arrangement.organizerName,
+        heldOn: arrangement.heldOn ?? "",
+      });
+
+      if (reflectToBookshelf) {
+        const savedBooks = listSavedBooks();
+
+        for (const book of books) {
+          const savedBook = savedBooks.find((saved) => saved.id === book.id);
+
+          if (savedBook) {
+            updateSavedBook(savedBook.localId, book);
+          } else {
+            saveBook(book);
+          }
+        }
+      }
+
+      navigate(`/arrange/${arrangement.id}`);
+    } catch (reason: unknown) {
+      setSubmitError(reason instanceof Error ? reason.message : "調整への参加に失敗しました。");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (error) {
     return (
       <section className="page">
@@ -101,7 +170,7 @@ export default function ArrangeParticipate() {
   return (
     <section className="page">
       <Link to={`/arrange/${arrangement.id}`} className="arrange-detail__back">
-        ← 調整詳細へ戻る
+        ← {arrangement.title}へ戻る
       </Link>
       <header className="page-header arrange-participate__header">
         <p className="page__eyebrow">PARTICIPATE</p>
@@ -122,13 +191,7 @@ export default function ArrangeParticipate() {
         )
       )}
 
-      <form
-        className="arrange-form arrange-participate__form"
-        onSubmit={(event) => {
-          event.preventDefault();
-          navigate(`/arrange/${arrangement.id}`);
-        }}
-      >
+      <form className="arrange-form arrange-participate__form" onSubmit={handleSubmit}>
         <label className="form-field arrange-participate__name">
           <span>あなたの名前</span>
           <input
@@ -197,12 +260,19 @@ export default function ArrangeParticipate() {
           />
           <span>読了状況を自分の本棚にも反映する</span>
         </label>
+
+        {submitError && (
+          <p className="form-error" role="alert">
+            {submitError}
+          </p>
+        )}
+
         <button
           type="submit"
           className="question-book-form__button"
-          disabled={!participantName.trim()}
+          disabled={isSubmitting || !participantName.trim()}
         >
-          参加する
+          {isSubmitting ? "参加中..." : "参加する"}
         </button>
       </form>
 
