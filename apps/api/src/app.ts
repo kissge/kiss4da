@@ -157,6 +157,8 @@ const app = new Hono<{ Bindings: ApiBindings }>()
            b.id,
            b.title,
            b.author,
+           COALESCE(b.published_at, '') AS publishedAt,
+           COALESCE(b.description, '') AS description,
            b.url,
            b.thumbnail_url AS thumbnailURL,
            ab.position,
@@ -169,6 +171,8 @@ const app = new Hono<{ Bindings: ApiBindings }>()
            aub.id,
            aub.title,
            aub.author,
+           '' AS publishedAt,
+           '' AS description,
            aub.url,
            '' AS thumbnailURL,
            aub.position,
@@ -182,6 +186,8 @@ const app = new Hono<{ Bindings: ApiBindings }>()
         id: string;
         title: string;
         author: string;
+        publishedAt: string;
+        description: string;
         url: string;
         thumbnailURL: string;
         position: number;
