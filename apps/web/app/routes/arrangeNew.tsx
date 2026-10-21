@@ -7,6 +7,7 @@ import { apiClient } from "../lib/apiClient";
 import { saveArrangement } from "../lib/arrangementRepository";
 import { listSavedBooks } from "../lib/bookRepository";
 import { getOrCreateInternalId } from "../lib/internalId";
+import { getSavedUserName, saveUserName } from "../lib/storage";
 import type { Book, BookFormValues, SavedBook } from "../lib/types";
 
 export function meta() {
@@ -50,7 +51,7 @@ export default function ArrangeNew() {
   const [books, setBooks] = useState<BookFormValues[]>([]);
   const [editingBook, setEditingBook] = useState<BookFormValues | null>(null);
   const [arrangementName, setArrangementName] = useState("");
-  const [organizerName, setOrganizerName] = useState("");
+  const [organizerName, setOrganizerName] = useState(() => getSavedUserName());
   const [heldOn, setHeldOn] = useState("");
   const [description, setDescription] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -124,6 +125,7 @@ export default function ArrangeNew() {
         organizerName: organizerName.trim(),
         heldOn,
       });
+      saveUserName(organizerName.trim());
       navigate(`/arrange/${result.id}`);
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "調整の作成に失敗しました。");

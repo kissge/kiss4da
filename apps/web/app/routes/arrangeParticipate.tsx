@@ -7,6 +7,7 @@ import { saveArrangement } from "../lib/arrangementRepository";
 import { listSavedBooks, saveBook, updateBook as updateSavedBook } from "../lib/bookRepository";
 import { formatDateForDisplay } from "../lib/date";
 import { getOrCreateInternalId } from "../lib/internalId";
+import { getSavedUserName, saveUserName } from "../lib/storage";
 import type { BookFormValues, ReadingStatus, SavedBook } from "../lib/types";
 
 type Arrangement = Awaited<ReturnType<typeof fetchArrangement>>;
@@ -66,7 +67,7 @@ export default function ArrangeParticipate() {
         const savedBookIds = new Set(savedBooks.map((book) => book.id));
         setArrangement(result);
         setParticipantId(participant?.participantId ?? null);
-        setParticipantName(participant?.participantName ?? "");
+        setParticipantName(participant?.participantName ?? getSavedUserName());
         setSavedBookCount(savedBooks.length);
         setBooks(
           result.books.map((book) =>
@@ -167,6 +168,7 @@ export default function ArrangeParticipate() {
         }
       }
 
+      saveUserName(participantName.trim());
       navigate(`/arrange/${arrangement.id}`);
     } catch (reason: unknown) {
       setSubmitError(reason instanceof Error ? reason.message : "調整への参加に失敗しました。");

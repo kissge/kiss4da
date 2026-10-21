@@ -4,12 +4,13 @@ const DATABASE_VERSION = 1;
 export type LocalDatabase = {
   version: typeof DATABASE_VERSION;
   internalId: string;
+  userName: string;
   books: import("./types").SavedBook[];
   arrangements: import("./types").SavedArrangement[];
 };
 
 function emptyDatabase(): LocalDatabase {
-  return { version: DATABASE_VERSION, internalId: "", books: [], arrangements: [] };
+  return { version: DATABASE_VERSION, internalId: "", userName: "", books: [], arrangements: [] };
 }
 
 function isLocalDatabase(value: unknown): value is LocalDatabase {
@@ -22,6 +23,7 @@ function isLocalDatabase(value: unknown): value is LocalDatabase {
     database.version === DATABASE_VERSION &&
     Array.isArray(database.books) &&
     (database.internalId === undefined || typeof database.internalId === "string") &&
+    (database.userName === undefined || typeof database.userName === "string") &&
     (database.arrangements === undefined || Array.isArray(database.arrangements))
   );
 }
@@ -50,6 +52,7 @@ export function readDatabase(): LocalDatabase {
   return {
     ...parsed,
     internalId: parsed.internalId ?? "",
+    userName: parsed.userName ?? "",
     arrangements: parsed.arrangements ?? [],
   };
 }
@@ -76,4 +79,13 @@ export function getOrCreateInternalId(): string {
   const internalId = crypto.randomUUID();
   writeDatabase({ ...database, internalId });
   return internalId;
+}
+
+export function getSavedUserName(): string {
+  return readDatabase().userName;
+}
+
+export function saveUserName(userName: string): void {
+  const database = readDatabase();
+  writeDatabase({ ...database, userName });
 }
