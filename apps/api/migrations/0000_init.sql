@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS arrangement_participants (
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
   UNIQUE (arrangement_id, participant_name),
-  FOREIGN KEY (arrangement_id) REFERENCES arrangements (participant_id) ON DELETE CASCADE
+  FOREIGN KEY (arrangement_id) REFERENCES arrangements (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS arrangement_participant_books (
