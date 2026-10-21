@@ -58,6 +58,17 @@ export default function ArrangeDetail() {
         <p className="arrange-detail__organizer">{arrangement.organizerName}</p>
         <p className="arrange-detail__date">{arrangement.heldOn || "開催日未定"}</p>
         {arrangement.description && <p className="page__description">{arrangement.description}</p>}
+        <Link to={`/arrange/${arrangement.id}/participate`} className="arrange-detail__participate">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="1.8"
+              d="M8 11.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.5 19.5v-1.25A4.25 4.25 0 0 1 7.75 14h.5a4.25 4.25 0 0 1 4.25 4.25v1.25M16 10V4m-3 3h6"
+            />
+          </svg>
+          参加する
+        </Link>
       </header>
 
       <section className="arrange-detail__books" aria-labelledby="arrange-detail-books-title">
