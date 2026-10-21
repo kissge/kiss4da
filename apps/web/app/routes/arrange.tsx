@@ -1,3 +1,9 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router";
+
+import { listSavedArrangements } from "../lib/arrangementRepository";
+import type { SavedArrangement } from "../lib/types";
+
 export function meta() {
   return [
     { title: "読むやつ調整 | kiss4da" },
@@ -23,7 +29,7 @@ export default function Arrange() {
   const [arrangements, setArrangements] = useState<SavedArrangement[]>([]);
 
   useEffect(() => {
-    setArrangements(listSavedArrangements());
+    setArrangements(listSavedArrangements().toReversed());
   }, []);
 
   return (
@@ -43,21 +49,16 @@ export default function Arrange() {
 
         <div className="arrange-list__items">
           {arrangements.map((arrangement) => (
-            <article className="arrange-card" key={arrangement.title}>
+            <Link to={`/arrange/${arrangement.id}`} className="arrange-card" key={arrangement.id}>
               <div className="arrange-card__info">
                 <h2>{arrangement.title}</h2>
                 <p>{arrangement.organizerName}</p>
                 <span>{formatCreatedDate(arrangement.heldOn)}</span>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       </section>
     </section>
   );
 }
-import { useEffect, useState } from "react";
-import { Link } from "react-router";
-
-import { listSavedArrangements } from "../lib/arrangementRepository";
-import type { SavedArrangement } from "../lib/types";

@@ -92,6 +92,76 @@ const app = new Hono<{ Bindings: ApiBindings }>()
 
     return c.json({ results });
   })
+  .get("/arrangements/:id", async (c) => {
+    const database = getDatabase(c.env);
+    const arrangementId = c.req.param("id");
+    const arrangement = await database
+      .prepare(
+        `SELECT
+           id,
+           title,
+           organizer_name AS organizerName,
+           held_on AS heldOn,
+           description,
+           created_at AS createdAt,
+           updated_at AS updatedAt
+         FROM arrangements
+         WHERE id = ?1`,
+      )
+      .bind(arrangementId)
+      .first<{
+        id: string;
+        title: string;
+        organizerName: string;
+        heldOn: string | null;
+        description: string;
+        createdAt: string;
+        updatedAt: string;
+      }>();
+
+    if (!arrangement) {
+      return c.json({ message: "調整が見つかりませんでした。" }, 404);
+    }
+
+    const { results: books } = await database
+      .prepare(
+        `SELECT
+           b.id,
+           b.title,
+           b.author,
+           b.url,
+           b.thumbnail_url AS thumbnailURL,
+           ab.position,
+           'registered' AS source
+         FROM arrangement_books ab
+         JOIN books b ON b.id = ab.book_id
+         WHERE ab.arrangement_id = ?1
+         UNION ALL
+         SELECT
+           aub.id,
+           aub.title,
+           aub.author,
+           aub.url,
+           '' AS thumbnailURL,
+           aub.position,
+           'unknown' AS source
+         FROM arrangement_unknown_books aub
+         WHERE aub.arrangement_id = ?1
+         ORDER BY position ASC`,
+      )
+      .bind(arrangementId)
+      .all<{
+        id: string;
+        title: string;
+        author: string;
+        url: string;
+        thumbnailURL: string;
+        position: number;
+        source: "registered" | "unknown";
+      }>();
+
+    return c.json({ ...arrangement, books });
+  })
   .post("/arrangements", zValidator("json", createArrangementSchema), async (c) => {
     const input = c.req.valid("json");
     const database = getDatabase(c.env);

@@ -119,7 +119,7 @@ export default function ArrangeNew() {
         organizerName: organizerName.trim(),
         heldOn,
       });
-      navigate("/arrange");
+      navigate(`/arrange/${result.id}`);
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "調整の作成に失敗しました。");
     } finally {
