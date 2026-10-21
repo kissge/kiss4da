@@ -194,7 +194,52 @@ const app = new Hono<{ Bindings: ApiBindings }>()
         source: "registered" | "unknown";
       }>();
 
-    return c.json({ ...arrangement, books });
+    const { results: participantBooks } = await database
+      .prepare(
+        `SELECT
+           ap.participant_name AS participantName,
+           apb.book_id AS bookId,
+           apb.reading_status AS readingStatus,
+           apb.read_range AS readRange,
+           apb.read_date AS readDate
+         FROM arrangement_participant_books apb
+         JOIN arrangement_participants ap ON ap.participant_id = apb.participant_id
+         WHERE apb.arrangement_id = ?1
+         UNION ALL
+         SELECT
+           ap.participant_name AS participantName,
+           apub.arrangement_unknown_book_id AS bookId,
+           apub.reading_status AS readingStatus,
+           apub.read_range AS readRange,
+           apub.read_date AS readDate
+         FROM arrangement_participant_unknown_books apub
+         JOIN arrangement_participants ap ON ap.participant_id = apub.participant_id
+         JOIN arrangement_unknown_books aub ON aub.id = apub.arrangement_unknown_book_id
+         WHERE aub.arrangement_id = ?1`,
+      )
+      .bind(arrangementId)
+      .all<{
+        participantName: string;
+        bookId: string;
+        readingStatus: "unread" | "partially-read" | "read";
+        readRange: string;
+        readDate: string | null;
+      }>();
+    const participantBooksByBookId = new Map<string, typeof participantBooks>();
+
+    for (const participantBook of participantBooks) {
+      const current = participantBooksByBookId.get(participantBook.bookId) ?? [];
+      current.push(participantBook);
+      participantBooksByBookId.set(participantBook.bookId, current);
+    }
+    const booksWithParticipants = books.map((book) => ({
+      ...book,
+      participants: (participantBooksByBookId.get(book.id) ?? []).map(
+        ({ bookId: _bookId, ...participant }) => participant,
+      ),
+    }));
+
+    return c.json({ ...arrangement, books: booksWithParticipants });
   })
   .post("/arrangements", zValidator("json", createArrangementSchema), async (c) => {
     const input = c.req.valid("json");

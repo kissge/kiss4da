@@ -74,6 +74,7 @@ body {
 .question-book-search__heading {
   align-items: baseline;
   display: flex;
+  flex-wrap: wrap;
   gap: 0.6rem;
   justify-content: space-between;
   margin: 0 0 0.75rem;
@@ -564,6 +565,11 @@ body {
   margin: 0.35rem 0 0;
 }
 
+.arrange-detail__participants {
+  color: #475569;
+  margin: 0.75rem 0 0;
+}
+
 .arrange-detail__participate {
   align-items: center;
   background: #2563eb;
@@ -642,6 +648,67 @@ body {
 
 .arrange-detail__books {
   margin-top: 2.5rem;
+}
+
+.arrange-detail__book-item {
+  min-width: 0;
+}
+
+.arrange-detail__book-item + .arrange-detail__book-item {
+  margin-top: 0.75rem;
+}
+
+.arrange-detail__reading-details {
+  border-left: 2px solid #dbeafe;
+  box-sizing: border-box;
+  margin: 0.65rem 0 0 1rem;
+  padding: 0 0 0 0.75rem;
+}
+
+.arrange-detail__reading-details summary {
+  color: #475569;
+  cursor: pointer;
+  font-size: 0.85rem;
+  list-style-position: inside;
+}
+
+.arrange-detail__reading-details[open] {
+  background: #f8fafc;
+  border-radius: 0 0.5rem 0.5rem 0;
+  padding-bottom: 0.35rem;
+  padding-top: 0.35rem;
+}
+
+.arrange-detail__reading-summary {
+  align-items: center;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.arrange-detail__reading-details dl {
+  margin: 0.75rem 0 0;
+}
+
+.arrange-detail__reading-details dl > div {
+  display: grid;
+  grid-template-columns: minmax(5rem, max-content) 1fr;
+  gap: 0.5rem;
+  padding: 0.45rem 0;
+}
+
+.arrange-detail__reading-details dt {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.arrange-detail__reading-details dd {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.55rem;
+  margin: 0;
+  min-width: 0;
 }
 
 .arrange-card__info {

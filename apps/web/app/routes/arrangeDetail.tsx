@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 
 import { apiClient } from "../lib/apiClient";
-import { formatDateOrFallback } from "../lib/date";
+import { formatDateForDisplay, formatDateOrFallback } from "../lib/date";
 
 export function meta() {
   return [
@@ -61,6 +61,21 @@ export default function ArrangeDetail() {
           {formatDateOrFallback(arrangement.heldOn ?? "", "開催日未定")}
         </p>
         {arrangement.description && <p className="page__description">{arrangement.description}</p>}
+        {(() => {
+          const participantNames = [
+            ...new Set(
+              arrangement.books.flatMap((book) =>
+                book.participants.map((item) => item.participantName),
+              ),
+            ),
+          ];
+
+          return participantNames.length > 0 ? (
+            <p className="arrange-detail__participants">
+              {participantNames.join("、")}（{participantNames.length}名）
+            </p>
+          ) : null;
+        })()}
         <Link to={`/arrange/${arrangement.id}/participate`} className="arrange-detail__participate">
           <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path
@@ -80,30 +95,94 @@ export default function ArrangeDetail() {
         </h2>
         <div className="question-book-list__items">
           {arrangement.books.map((book) => (
-            <a
-              className="question-book-card"
-              href={book.url || undefined}
-              key={book.id}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {book.thumbnailURL ? (
-                <img src={book.thumbnailURL} alt="" className="question-book-card__thumbnail" />
-              ) : (
-                <div className="question-book-card__thumbnail-placeholder" aria-hidden="true">
-                  本
-                </div>
+            <div className="arrange-detail__book-item" key={book.id}>
+              <article className="question-book-card">
+                <a
+                  className="question-book-card__link"
+                  href={book.url || undefined}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {book.thumbnailURL ? (
+                    <img src={book.thumbnailURL} alt="" className="question-book-card__thumbnail" />
+                  ) : (
+                    <div className="question-book-card__thumbnail-placeholder" aria-hidden="true">
+                      本
+                    </div>
+                  )}
+                  <div className="question-book-card__info">
+                    <h3>{book.title}</h3>
+                    {book.author && <p>{book.author}</p>}
+                  </div>
+                </a>
+              </article>
+              {book.participants.length > 0 && (
+                <details className="arrange-detail__reading-details">
+                  <summary>
+                    <ReadingStatusSummary participants={book.participants} />
+                  </summary>
+                  <dl>
+                    {book.participants.map((participant, index) => (
+                      <div key={`${participant.participantName}-${index}`}>
+                        <dt>{participant.participantName}</dt>
+                        <dd>
+                          <span
+                            className={`reading-status-badge reading-status-badge--${participant.readingStatus}`}
+                          >
+                            {readingStatusLabel(participant.readingStatus)}
+                          </span>
+                          {participant.readRange && <span>{participant.readRange}</span>}
+                          {participant.readDate && (
+                            <span>{formatDateForDisplay(participant.readDate)}</span>
+                          )}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </details>
               )}
-              <div className="question-book-card__info">
-                <h3>{book.title}</h3>
-                {book.author && <p>{book.author}</p>}
-              </div>
-            </a>
+            </div>
           ))}
         </div>
       </section>
     </section>
   );
+}
+
+function readingStatusLabel(status: "unread" | "partially-read" | "read"): string {
+  return status === "unread" ? "未読" : status === "read" ? "既読" : "一部既読";
+}
+
+function ReadingStatusSummary({
+  participants,
+}: {
+  participants: {
+    readingStatus: "unread" | "partially-read" | "read";
+  }[];
+}) {
+  const counts = {
+    unread: participants.filter((item) => item.readingStatus === "unread").length,
+    "partially-read": participants.filter((item) => item.readingStatus === "partially-read").length,
+    read: participants.filter((item) => item.readingStatus === "read").length,
+  };
+
+  const summaries = [
+    counts.unread > 0 && (
+      <span className="reading-status-badge reading-status-badge--unread">
+        未読 {counts.unread}
+      </span>
+    ),
+    counts["partially-read"] > 0 && (
+      <span className="reading-status-badge reading-status-badge--partially-read">
+        一部既読 {counts["partially-read"]}
+      </span>
+    ),
+    counts.read > 0 && (
+      <span className="reading-status-badge reading-status-badge--read">既読 {counts.read}</span>
+    ),
+  ].filter(Boolean);
+
+  return <span className="arrange-detail__reading-summary">{summaries}</span>;
 }
 
 async function fetchArrangement(id: string) {
