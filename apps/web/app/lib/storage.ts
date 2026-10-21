@@ -4,10 +4,11 @@ const DATABASE_VERSION = 1;
 export type LocalDatabase = {
   version: typeof DATABASE_VERSION;
   books: import("./types").SavedBook[];
+  arrangements: import("./types").SavedArrangement[];
 };
 
 function emptyDatabase(): LocalDatabase {
-  return { version: DATABASE_VERSION, books: [] };
+  return { version: DATABASE_VERSION, books: [], arrangements: [] };
 }
 
 function isLocalDatabase(value: unknown): value is LocalDatabase {
@@ -16,7 +17,11 @@ function isLocalDatabase(value: unknown): value is LocalDatabase {
   }
 
   const database = value as Partial<LocalDatabase>;
-  return database.version === DATABASE_VERSION && Array.isArray(database.books);
+  return (
+    database.version === DATABASE_VERSION &&
+    Array.isArray(database.books) &&
+    (database.arrangements === undefined || Array.isArray(database.arrangements))
+  );
 }
 
 export function readDatabase(): LocalDatabase {
@@ -40,7 +45,10 @@ export function readDatabase(): LocalDatabase {
     throw new Error("ローカルの保存データの形式が正しくありません。");
   }
 
-  return parsed;
+  return {
+    ...parsed,
+    arrangements: parsed.arrangements ?? [],
+  };
 }
 
 export function writeDatabase(database: LocalDatabase): void {

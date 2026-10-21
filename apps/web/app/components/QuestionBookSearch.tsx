@@ -8,6 +8,7 @@ type QuestionBookSearchProps = {
   onSelectBook: (book: Book) => void;
   onAddBook: (query: string) => void;
   onBookAdded?: () => void;
+  excludedBookIds?: string[];
 };
 
 export function QuestionBookSearch({
@@ -15,6 +16,7 @@ export function QuestionBookSearch({
   onSelectBook,
   onAddBook,
   onBookAdded,
+  excludedBookIds = [],
 }: QuestionBookSearchProps) {
   const [query, setQuery] = useState("");
   const [books, setBooks] = useState<Book[]>([]);
@@ -55,7 +57,11 @@ export function QuestionBookSearch({
         }
 
         const data = await response.json();
-        setBooks(data.results);
+        setBooks(
+          excludedBookIds.length > 0
+            ? data.results.filter((book) => !excludedBookIds.includes(book.id))
+            : data.results,
+        );
         setIsSuggestionsOpen(true);
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
@@ -73,7 +79,7 @@ export function QuestionBookSearch({
       controller.abort();
       window.clearTimeout(timeoutId);
     };
-  }, [query]);
+  }, [excludedBookIds, query, savedBooks]);
 
   return (
     <div className="question-book-search">

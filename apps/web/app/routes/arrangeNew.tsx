@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 
 import { ArrangeBookDialog } from "../components/ArrangeBookDialog";
 import { QuestionBookSearch } from "../components/QuestionBookSearch";
+import { apiClient } from "../lib/apiClient";
+import { saveArrangement } from "../lib/arrangementRepository";
 import { listSavedBooks } from "../lib/bookRepository";
 import type { Book, BookFormValues, SavedBook } from "../lib/types";
 
@@ -47,6 +50,12 @@ export default function ArrangeNew() {
   const [editingBook, setEditingBook] = useState<BookFormValues | null>(null);
   const [arrangementName, setArrangementName] = useState("");
   const [organizerName, setOrganizerName] = useState("");
+  const [heldOn, setHeldOn] = useState("");
+  const [description, setDescription] = useState("");
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const excludedBookIds = useMemo(() => books.map((book) => book.id), [books]);
 
   useEffect(() => {
     setSavedBooks(listSavedBooks());
@@ -76,6 +85,48 @@ export default function ArrangeNew() {
     setEditingBook(null);
   };
 
+  const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitError(null);
+    setIsSubmitting(true);
+
+    try {
+      const response = await apiClient.arrangements.$post({
+        json: {
+          title: arrangementName.trim(),
+          organizerName: organizerName.trim(),
+          heldOn,
+          description,
+          books: books.map((book, position) => ({
+            id: book.id,
+            title: book.title,
+            author: book.author,
+            url: book.url,
+            position,
+          })),
+        },
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(errorBody || `調整の作成に失敗しました (${response.status})`);
+      }
+
+      const result = await response.json();
+      saveArrangement({
+        id: result.id,
+        title: arrangementName.trim(),
+        organizerName: organizerName.trim(),
+        heldOn,
+      });
+      navigate("/arrange");
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "調整の作成に失敗しました。");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <section className="page">
       <header className="page-header">
@@ -83,7 +134,7 @@ export default function ArrangeNew() {
         <h1 className="page__title">調整を新規作成</h1>
       </header>
 
-      <form className="arrange-form" onSubmit={(event) => event.preventDefault()}>
+      <form className="arrange-form" onSubmit={handleSubmit}>
         <label className="form-field">
           <span>会の名前</span>
           <input
@@ -104,12 +155,28 @@ export default function ArrangeNew() {
         </label>
         <label className="form-field">
           <span>開催日</span>
-          <input name="heldOn" type="date" />
+          <input
+            name="heldOn"
+            type="date"
+            value={heldOn}
+            onChange={(event) => setHeldOn(event.target.value)}
+          />
         </label>
         <label className="form-field">
           <span>説明</span>
-          <textarea name="description" rows={4} />
+          <textarea
+            name="description"
+            rows={4}
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+          />
         </label>
+
+        {submitError && (
+          <p className="form-error" role="alert">
+            {submitError}
+          </p>
+        )}
 
         <section className="arrange-form__books" aria-labelledby="arrange-books-title">
           <div className="arrange-form__section-heading">
@@ -120,6 +187,7 @@ export default function ArrangeNew() {
             savedBooks={savedBooks}
             onSelectBook={addBook}
             onAddBook={addBookFromQuery}
+            excludedBookIds={excludedBookIds}
           />
           <div className="question-book-list__items">
             {books.map((book) => (
@@ -191,9 +259,11 @@ export default function ArrangeNew() {
         <button
           type="submit"
           className="question-book-form__button"
-          disabled={!arrangementName.trim() || !organizerName.trim() || books.length === 0}
+          disabled={
+            isSubmitting || !arrangementName.trim() || !organizerName.trim() || books.length === 0
+          }
         >
-          作成
+          {isSubmitting ? "作成中..." : "作成"}
         </button>
       </form>
       {editingBook && (

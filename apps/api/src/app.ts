@@ -2,6 +2,7 @@ import type { D1Database } from "@cloudflare/workers-types";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { nanoid } from "nanoid";
 import { z } from "zod";
 
 import { getDatabase } from "./db.js";
@@ -14,6 +15,38 @@ export type ApiBindings = {
 const booksQuerySchema = z.object({
   q: z.string().optional().default(""),
 });
+
+const arrangementBookSchema = z.object({
+  id: z.string().trim().min(1),
+  title: z.string().trim().min(1),
+  author: z.string().trim().default(""),
+  url: z.string().trim().default(""),
+  position: z.number().int().nonnegative(),
+});
+
+const createArrangementSchema = z
+  .object({
+    title: z.string().trim().min(1),
+    organizerName: z.string().trim().min(1),
+    heldOn: z.string().trim().optional().default(""),
+    description: z.string().default(""),
+    books: z.array(arrangementBookSchema).min(1),
+  })
+  .superRefine((value, context) => {
+    const ids = new Set<string>();
+
+    for (const [index, book] of value.books.entries()) {
+      if (ids.has(book.id)) {
+        context.addIssue({
+          code: "custom",
+          message: "読む本リストに同じ本を重複して登録できません。",
+          path: ["books", index, "id"],
+        });
+      }
+
+      ids.add(book.id);
+    }
+  });
 
 const app = new Hono<{ Bindings: ApiBindings }>()
   .use(
@@ -58,6 +91,70 @@ const app = new Hono<{ Bindings: ApiBindings }>()
       }>();
 
     return c.json({ results });
+  })
+  .post("/arrangements", zValidator("json", createArrangementSchema), async (c) => {
+    const input = c.req.valid("json");
+    const database = getDatabase(c.env);
+    const arrangementId = nanoid();
+    const now = new Date().toISOString();
+    const existingBookIds = new Set<string>();
+
+    for (const book of input.books) {
+      const existingBook = await database
+        .prepare("SELECT id FROM books WHERE id = ?1")
+        .bind(book.id)
+        .first<{ id: string }>();
+
+      if (existingBook) {
+        existingBookIds.add(book.id);
+      }
+    }
+
+    const statements = [
+      database
+        .prepare(
+          `INSERT INTO arrangements
+             (id, title, organizer_name, held_on, description, created_at, updated_at)
+           VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?6)`,
+        )
+        .bind(
+          arrangementId,
+          input.title,
+          input.organizerName,
+          input.heldOn,
+          input.description,
+          now,
+        ),
+      ...input.books.map((book) => {
+        if (existingBookIds.has(book.id)) {
+          return database
+            .prepare(
+              `INSERT INTO arrangement_books (arrangement_id, book_id, position)
+               VALUES (?1, ?2, ?3)`,
+            )
+            .bind(arrangementId, book.id, book.position);
+        }
+
+        return database
+          .prepare(
+            `INSERT INTO arrangement_unknown_books
+               (id, arrangement_id, position, title, author, url)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6)`,
+          )
+          .bind(
+            crypto.randomUUID(),
+            arrangementId,
+            book.position,
+            book.title,
+            book.author,
+            book.url,
+          );
+      }),
+    ];
+
+    await database.batch(statements);
+
+    return c.json({ id: arrangementId }, 201);
   });
 
 export { app, booksQuerySchema };

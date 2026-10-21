@@ -5,17 +5,27 @@ export function meta() {
   ];
 }
 
-const arrangements = [
-  { title: "次回の読書会", author: "読書会運営チーム", heldOn: "2026-10-20" },
-  { title: "春のクイズ大会", author: "クイズ研究会", heldOn: "2026-10-12" },
-  { title: "資格勉強会", author: "学習サークル", heldOn: "2026-10-05" },
-];
-
 function formatCreatedDate(value: string) {
-  return new Intl.DateTimeFormat("ja-JP", { dateStyle: "medium" }).format(new Date(value));
+  if (!value) {
+    return "開催日未定";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "開催日未定";
+  }
+
+  return new Intl.DateTimeFormat("ja-JP", { dateStyle: "medium" }).format(date);
 }
 
 export default function Arrange() {
+  const [arrangements, setArrangements] = useState<SavedArrangement[]>([]);
+
+  useEffect(() => {
+    setArrangements(listSavedArrangements());
+  }, []);
+
   return (
     <section className="page">
       <section className="arrange-list" aria-labelledby="arrange-list-title">
@@ -36,7 +46,7 @@ export default function Arrange() {
             <article className="arrange-card" key={arrangement.title}>
               <div className="arrange-card__info">
                 <h2>{arrangement.title}</h2>
-                <p>{arrangement.author}</p>
+                <p>{arrangement.organizerName}</p>
                 <span>{formatCreatedDate(arrangement.heldOn)}</span>
               </div>
             </article>
@@ -46,4 +56,8 @@ export default function Arrange() {
     </section>
   );
 }
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
+
+import { listSavedArrangements } from "../lib/arrangementRepository";
+import type { SavedArrangement } from "../lib/types";

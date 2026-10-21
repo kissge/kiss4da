@@ -21,3 +21,10 @@ export type SavedBook = BookFormValues & {
   createdAt: string;
   updatedAt: string;
 };
+
+export type SavedArrangement = {
+  id: string;
+  title: string;
+  organizerName: string;
+  heldOn: string;
+};
