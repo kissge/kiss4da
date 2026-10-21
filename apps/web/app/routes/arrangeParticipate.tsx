@@ -174,7 +174,6 @@ export default function ArrangeParticipate() {
         ← {arrangement.title}へ戻る
       </Link>
       <header className="page-header arrange-participate__header">
-        <p className="page__eyebrow">PARTICIPATE</p>
         <h1 className="page__title">{arrangement.title}に参加する</h1>
         <p className="page__description">あなたの読了状況を入力してください。</p>
       </header>

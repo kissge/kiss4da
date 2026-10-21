@@ -54,7 +54,6 @@ export default function ArrangeDetail() {
         ← 調整一覧
       </Link>
       <header className="arrange-detail__header">
-        <p className="page__eyebrow">ARRANGEMENT</p>
         <h1 className="page__title">{arrangement.title}</h1>
         <p className="arrange-detail__organizer">{arrangement.organizerName}</p>
         <p className="arrange-detail__date">

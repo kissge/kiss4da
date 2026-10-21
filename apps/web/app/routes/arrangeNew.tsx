@@ -130,7 +130,6 @@ export default function ArrangeNew() {
   return (
     <section className="page">
       <header className="page-header">
-        <p className="page__eyebrow">NEW ARRANGEMENT</p>
         <h1 className="page__title">調整を新規作成</h1>
       </header>
 

@@ -41,14 +41,6 @@ body {
   padding: 0 0.25rem;
 }
 
-.page__eyebrow {
-  color: #64748b;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  margin: 0 0 0.75rem;
-}
-
 .page__title {
   font-size: clamp(1.75rem, 8vw, 2.5rem);
   letter-spacing: -0.04em;
@@ -982,7 +974,6 @@ body {
     @apply bg-gray-950;
   }
 
-  .page__eyebrow,
   .page__description,
   .question-book-list__empty {
     color: #94a3b8;
