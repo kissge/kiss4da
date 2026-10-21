@@ -11,12 +11,14 @@ type QuestionBookSearchProps = {
   excludedBookIds?: string[];
 };
 
+const EMPTY_EXCLUDED_BOOK_IDS: string[] = [];
+
 export function QuestionBookSearch({
   savedBooks,
   onSelectBook,
   onAddBook,
   onBookAdded,
-  excludedBookIds = [],
+  excludedBookIds = EMPTY_EXCLUDED_BOOK_IDS,
 }: QuestionBookSearchProps) {
   const [query, setQuery] = useState("");
   const [books, setBooks] = useState<Book[]>([]);
@@ -79,7 +81,7 @@ export function QuestionBookSearch({
       controller.abort();
       window.clearTimeout(timeoutId);
     };
-  }, [excludedBookIds, query, savedBooks]);
+  }, [excludedBookIds, query]);
 
   return (
     <div className="question-book-search">
