@@ -7,18 +7,27 @@ type QuestionBookSearchProps = {
   savedBooks: SavedBook[];
   onSelectBook: (book: Book) => void;
   onAddBook: (query: string) => void;
+  onBookAdded?: () => void;
 };
 
 export function QuestionBookSearch({
   savedBooks,
   onSelectBook,
   onAddBook,
+  onBookAdded,
 }: QuestionBookSearchProps) {
   const [query, setQuery] = useState("");
   const [books, setBooks] = useState<Book[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
+
+  const finishAdding = () => {
+    setQuery("");
+    setBooks([]);
+    setIsSuggestionsOpen(false);
+    onBookAdded?.();
+  };
 
   useEffect(() => {
     const trimmedQuery = query.trim();
@@ -122,8 +131,8 @@ export function QuestionBookSearch({
                       className="question-book-suggestion"
                       role="option"
                       onClick={() => {
-                        setIsSuggestionsOpen(false);
                         onSelectBook(book);
+                        finishAdding();
                       }}
                     >
                       <img
@@ -146,8 +155,8 @@ export function QuestionBookSearch({
           type="button"
           className="question-book-form__button"
           onClick={() => {
-            setIsSuggestionsOpen(false);
             onAddBook(query);
+            finishAdding();
           }}
         >
           追加

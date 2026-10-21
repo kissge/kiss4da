@@ -1,0 +1,209 @@
+import { useEffect, useState } from "react";
+
+import { ArrangeBookDialog } from "../components/ArrangeBookDialog";
+import { QuestionBookSearch } from "../components/QuestionBookSearch";
+import { listSavedBooks } from "../lib/bookRepository";
+import type { Book, BookFormValues, SavedBook } from "../lib/types";
+
+export function meta() {
+  return [
+    { title: "調整を新規作成 | kiss4da" },
+    { name: "description", content: "読む本と日程の調整を新規作成します。" },
+  ];
+}
+
+function createBookFromQuery(query: string): Book | null {
+  const title = query.trim();
+
+  if (!title) {
+    return null;
+  }
+
+  return {
+    id: `custom-${crypto.randomUUID()}`,
+    title,
+    author: "",
+    publishedAt: "",
+    description: "",
+    url: "",
+    thumbnailURL: "",
+  };
+}
+
+function createArrangeBook(book: Book, savedBook?: SavedBook): BookFormValues {
+  return {
+    ...book,
+    readingStatus: savedBook?.readingStatus ?? "unread",
+    readDate: savedBook?.readDate ?? "",
+    readSession: savedBook?.readSession ?? "",
+    readRange: savedBook?.readRange ?? "",
+    comment: "",
+  };
+}
+
+export default function ArrangeNew() {
+  const [savedBooks, setSavedBooks] = useState<SavedBook[]>([]);
+  const [books, setBooks] = useState<BookFormValues[]>([]);
+  const [editingBook, setEditingBook] = useState<BookFormValues | null>(null);
+  const [arrangementName, setArrangementName] = useState("");
+  const [organizerName, setOrganizerName] = useState("");
+
+  useEffect(() => {
+    setSavedBooks(listSavedBooks());
+  }, []);
+
+  const addBook = (book: Book) => {
+    const savedBook = savedBooks.find((saved) => saved.id === book.id);
+    setBooks((currentBooks) =>
+      currentBooks.some((currentBook) => currentBook.id === book.id)
+        ? currentBooks
+        : [...currentBooks, createArrangeBook(book, savedBook)],
+    );
+  };
+
+  const addBookFromQuery = (query: string) => {
+    const book = createBookFromQuery(query);
+
+    if (book) {
+      addBook(book);
+    }
+  };
+
+  const updateBook = (updatedBook: BookFormValues) => {
+    setBooks((currentBooks) =>
+      currentBooks.map((book) => (book.id === updatedBook.id ? updatedBook : book)),
+    );
+    setEditingBook(null);
+  };
+
+  return (
+    <section className="page">
+      <header className="page-header">
+        <p className="page__eyebrow">NEW ARRANGEMENT</p>
+        <h1 className="page__title">調整を新規作成</h1>
+      </header>
+
+      <form className="arrange-form" onSubmit={(event) => event.preventDefault()}>
+        <label className="form-field">
+          <span>会の名前</span>
+          <input
+            name="title"
+            type="text"
+            value={arrangementName}
+            onChange={(event) => setArrangementName(event.target.value)}
+          />
+        </label>
+        <label className="form-field">
+          <span>主催者の名前</span>
+          <input
+            name="author"
+            type="text"
+            value={organizerName}
+            onChange={(event) => setOrganizerName(event.target.value)}
+          />
+        </label>
+        <label className="form-field">
+          <span>開催日</span>
+          <input name="heldOn" type="date" />
+        </label>
+        <label className="form-field">
+          <span>説明</span>
+          <textarea name="description" rows={4} />
+        </label>
+
+        <section className="arrange-form__books" aria-labelledby="arrange-books-title">
+          <div className="arrange-form__section-heading">
+            <h2 id="arrange-books-title">読む本リスト</h2>
+            <span>{books.length}冊</span>
+          </div>
+          <QuestionBookSearch
+            savedBooks={savedBooks}
+            onSelectBook={addBook}
+            onAddBook={addBookFromQuery}
+          />
+          <div className="question-book-list__items">
+            {books.map((book) => (
+              <article className="question-book-card" key={book.id}>
+                <div className="question-book-card__link">
+                  {book.thumbnailURL ? (
+                    <img src={book.thumbnailURL} alt="" className="question-book-card__thumbnail" />
+                  ) : (
+                    <div className="question-book-card__thumbnail-placeholder" aria-hidden="true">
+                      本
+                    </div>
+                  )}
+                  <div className="question-book-card__info">
+                    <h3>{book.title}</h3>
+                    {book.author && <p>{book.author}</p>}
+                    <div className="question-book-card__details">
+                      <span
+                        className={`reading-status-badge reading-status-badge--${book.readingStatus}`}
+                      >
+                        {book.readingStatus === "unread"
+                          ? "未読"
+                          : book.readingStatus === "read"
+                            ? "既読"
+                            : "一部既読"}
+                      </span>
+                      {book.readRange && <span>{book.readRange}</span>}
+                    </div>
+                  </div>
+                </div>
+                <div className="question-book-card__actions">
+                  <button
+                    type="button"
+                    className="question-book-card__edit"
+                    aria-label={`${book.title}を編集`}
+                    onClick={() => setEditingBook(book)}
+                  >
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="1.8"
+                        d="m16.862 3.487 3.65 3.65M5 19l3.75-.75L19.7 7.3a2.58 2.58 0 0 0-3.65-3.65L5.1 14.6 5 19Z"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    className="question-book-card__delete"
+                    aria-label={`${book.title}を読む本リストから削除`}
+                    onClick={() =>
+                      setBooks((currentBooks) => currentBooks.filter((item) => item.id !== book.id))
+                    }
+                  >
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="1.8"
+                        d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7l1-3h4l1 3"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <button
+          type="submit"
+          className="question-book-form__button"
+          disabled={!arrangementName.trim() || !organizerName.trim() || books.length === 0}
+        >
+          作成
+        </button>
+      </form>
+      {editingBook && (
+        <ArrangeBookDialog
+          values={editingBook}
+          onChange={setEditingBook}
+          onClose={() => setEditingBook(null)}
+          onSave={updateBook}
+        />
+      )}
+    </section>
+  );
+}
