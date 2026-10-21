@@ -78,6 +78,10 @@ const participateArrangementSchema = z
     }
   });
 
+const participantUserIdParamSchema = z.object({
+  userId: z.string().trim().min(1),
+});
+
 const app = new Hono<{ Bindings: ApiBindings }>()
   .use(
     "*",
@@ -309,6 +313,173 @@ const app = new Hono<{ Bindings: ApiBindings }>()
     await database.batch(statements);
 
     return c.json({ id: arrangementId }, 201);
+  })
+  .get("/arrangements/:id/participants/:userId", async (c) => {
+    const database = getDatabase(c.env);
+    const arrangementId = c.req.param("id");
+    const { userId } = participantUserIdParamSchema.parse(c.req.param());
+    const participant = await database
+      .prepare(
+        `SELECT participant_id AS participantId, participant_name AS participantName
+         FROM arrangement_participants
+         WHERE arrangement_id = ?1 AND user_id = ?2`,
+      )
+      .bind(arrangementId, userId)
+      .first<{ participantId: string; participantName: string }>();
+
+    if (!participant) {
+      return c.json({ message: "この調整にはまだ参加していません。" }, 404);
+    }
+
+    const [{ results: books }, { results: unknownBooks }] = await Promise.all([
+      database
+        .prepare(
+          `SELECT book_id AS id, reading_status AS readingStatus,
+                  read_range AS readRange, COALESCE(read_date, '') AS readDate
+           FROM arrangement_participant_books
+           WHERE participant_id = ?1 AND arrangement_id = ?2`,
+        )
+        .bind(participant.participantId, arrangementId)
+        .all<{
+          id: string;
+          readingStatus: "unread" | "partially-read" | "read";
+          readRange: string;
+          readDate: string;
+        }>(),
+      database
+        .prepare(
+          `SELECT arrangement_unknown_book_id AS id, reading_status AS readingStatus,
+                  read_range AS readRange, COALESCE(read_date, '') AS readDate
+           FROM arrangement_participant_unknown_books
+           WHERE participant_id = ?1`,
+        )
+        .bind(participant.participantId)
+        .all<{
+          id: string;
+          readingStatus: "unread" | "partially-read" | "read";
+          readRange: string;
+          readDate: string;
+        }>(),
+    ]);
+
+    return c.json({ ...participant, books: [...books, ...unknownBooks] });
+  })
+  .put(
+    "/arrangements/:id/participants/:userId",
+    zValidator("json", participateArrangementSchema),
+    async (c) => {
+      const input = c.req.valid("json");
+      const database = getDatabase(c.env);
+      const arrangementId = c.req.param("id");
+      const { userId } = participantUserIdParamSchema.parse(c.req.param());
+      const participant = await database
+        .prepare(
+          `SELECT participant_id AS participantId
+           FROM arrangement_participants
+           WHERE arrangement_id = ?1 AND user_id = ?2`,
+        )
+        .bind(arrangementId, userId)
+        .first<{ participantId: string }>();
+
+      if (!participant) {
+        return c.json({ message: "この調整にはまだ参加していません。" }, 404);
+      }
+
+      const conflictingParticipant = await database
+        .prepare(
+          `SELECT participant_id
+           FROM arrangement_participants
+           WHERE arrangement_id = ?1
+             AND participant_id != ?2
+             AND (participant_name = ?3 OR user_id = ?4)`,
+        )
+        .bind(arrangementId, participant.participantId, input.participantName, userId)
+        .first<{ participantId: string }>();
+
+      if (conflictingParticipant) {
+        return c.json({ message: "この名前は別の参加者が使用しています。" }, 409);
+      }
+
+      const statements = [
+        database
+          .prepare(
+            `UPDATE arrangement_participants
+             SET participant_name = ?, updated_at = ?
+             WHERE participant_id = ?`,
+          )
+          .bind(input.participantName, new Date().toISOString(), participant.participantId),
+        database
+          .prepare("DELETE FROM arrangement_participant_books WHERE participant_id = ?")
+          .bind(participant.participantId),
+        database
+          .prepare("DELETE FROM arrangement_participant_unknown_books WHERE participant_id = ?")
+          .bind(participant.participantId),
+        ...input.books.map((book) =>
+          database
+            .prepare(
+              `INSERT INTO arrangement_participant_books
+                 (participant_id, arrangement_id, book_id, reading_status, read_range, read_date)
+               SELECT ?, ?, ?, ?, ?, ?
+               WHERE EXISTS (
+                 SELECT 1 FROM arrangement_books
+                 WHERE arrangement_id = ? AND book_id = ?
+               )`,
+            )
+            .bind(
+              participant.participantId,
+              arrangementId,
+              book.id,
+              book.readingStatus,
+              book.readRange,
+              book.readDate || null,
+              arrangementId,
+              book.id,
+            ),
+        ),
+        ...input.books.map((book) =>
+          database
+            .prepare(
+              `INSERT INTO arrangement_participant_unknown_books
+                 (participant_id, arrangement_unknown_book_id, reading_status, read_range, read_date)
+               SELECT ?, ?, ?, ?, ?
+               WHERE EXISTS (
+                 SELECT 1 FROM arrangement_unknown_books
+                 WHERE id = ? AND arrangement_id = ?
+               )`,
+            )
+            .bind(
+              participant.participantId,
+              book.id,
+              book.readingStatus,
+              book.readRange,
+              book.readDate || null,
+              book.id,
+              arrangementId,
+            ),
+        ),
+      ];
+
+      await database.batch(statements);
+      return c.json({ participantId: participant.participantId });
+    },
+  )
+  .delete("/arrangements/:id/participants/:userId", async (c) => {
+    const database = getDatabase(c.env);
+    const arrangementId = c.req.param("id");
+    const { userId } = participantUserIdParamSchema.parse(c.req.param());
+    const result = await database
+      .prepare(
+        `DELETE FROM arrangement_participants
+         WHERE arrangement_id = ?1 AND user_id = ?2`,
+      )
+      .bind(arrangementId, userId)
+      .run();
+
+    if (!result.meta.changes) {
+      return c.json({ message: "この調整には参加していません。" }, 404);
+    }
+
+    return c.body(null, 204);
   })
   .post(
     "/arrangements/:id/participants",

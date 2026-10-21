@@ -585,6 +585,46 @@ body {
   width: 1.1rem;
 }
 
+.arrange-detail__participant-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+}
+
+.arrange-detail__participant-actions .arrange-detail__participate {
+  margin-top: 0;
+}
+
+.arrange-detail__leave {
+  align-items: center;
+  background: transparent;
+  border: 1px solid #fecaca;
+  border-radius: 0.7rem;
+  color: #b91c1c;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 0.4rem;
+  padding: 0.65rem 0.9rem;
+}
+
+.arrange-detail__leave svg {
+  height: 1.1rem;
+  width: 1.1rem;
+}
+
+.arrange-detail__leave:hover,
+.arrange-detail__leave:focus-visible {
+  background: #fef2f2;
+  outline: none;
+}
+
+.arrange-detail__leave:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
 .arrange-participate__header {
   margin-top: 1.75rem;
 }

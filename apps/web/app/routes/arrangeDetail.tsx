@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router";
 
 import { apiClient } from "../lib/apiClient";
 import { formatDateForDisplay, formatDateOrFallback } from "../lib/date";
+import { getOrCreateInternalId } from "../lib/internalId";
 
 export function meta() {
   return [
@@ -17,6 +18,9 @@ export default function ArrangeDetail() {
     ReturnType<typeof fetchArrangement>
   > | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isParticipant, setIsParticipant] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
+  const [participantError, setParticipantError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) {
@@ -24,12 +28,41 @@ export default function ArrangeDetail() {
       return;
     }
 
-    void fetchArrangement(id)
-      .then(setArrangement)
+    const userId = getOrCreateInternalId();
+    void Promise.all([fetchArrangement(id), fetchParticipant(id, userId)])
+      .then(([result, participant]) => {
+        setArrangement(result);
+        setIsParticipant(participant);
+      })
       .catch((reason: unknown) => {
         setError(reason instanceof Error ? reason.message : "調整を読み込めませんでした。");
       });
   }, [id]);
+
+  const leaveArrangement = async () => {
+    if (!arrangement || isLeaving) return;
+    setIsLeaving(true);
+    setParticipantError(null);
+
+    try {
+      const response = await apiClient.arrangements[":id"].participants[":userId"].$delete({
+        param: { id: arrangement.id, userId: getOrCreateInternalId() },
+      });
+
+      if (!response.ok) {
+        const body = (await response.json()) as { message?: string };
+        throw new Error(body.message ?? "調整から抜けられませんでした。");
+      }
+
+      window.location.reload();
+    } catch (reason: unknown) {
+      setParticipantError(
+        reason instanceof Error ? reason.message : "調整から抜けられませんでした。",
+      );
+    } finally {
+      setIsLeaving(false);
+    }
+  };
 
   if (error) {
     return (
@@ -75,17 +108,69 @@ export default function ArrangeDetail() {
             </p>
           ) : null;
         })()}
-        <Link to={`/arrange/${arrangement.id}/participate`} className="arrange-detail__participate">
-          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="1.8"
-              d="M8 11.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.5 19.5v-1.25A4.25 4.25 0 0 1 7.75 14h.5a4.25 4.25 0 0 1 4.25 4.25v1.25M16 10V4m-3 3h6"
-            />
-          </svg>
-          参加する
-        </Link>
+        {participantError && (
+          <p className="form-error" role="alert">
+            {participantError}
+          </p>
+        )}
+        {isParticipant ? (
+          <div className="arrange-detail__participant-actions">
+            <Link
+              to={`/arrange/${arrangement.id}/participate`}
+              className="arrange-detail__participate"
+            >
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.8"
+                  d="m14.5 5.5 4 4M5 19l3.2-.7L19.7 6.8a1.8 1.8 0 0 0-2.5-2.5L5.7 15.8 5 19Z"
+                />
+              </svg>
+              読了状況を編集する
+            </Link>
+            <button
+              type="button"
+              className="arrange-detail__leave"
+              onClick={() => void leaveArrangement()}
+              disabled={isLeaving}
+            >
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.8"
+                  d="M14 4H5v16h9"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.8"
+                  d="M10 12h10m-3-3 3 3-3 3"
+                />
+                <circle cx="8" cy="8" r="1.4" />
+                <path strokeLinecap="round" strokeWidth="1.8" d="M8 10v5m0 0-2 3m2-3 2 3" />
+              </svg>
+              {isLeaving ? "退会中..." : "参加をやめる"}
+            </button>
+          </div>
+        ) : (
+          <Link
+            to={`/arrange/${arrangement.id}/participate`}
+            className="arrange-detail__participate"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.8"
+                d="M8 11.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.5 19.5v-1.25A4.25 4.25 0 0 1 7.75 14h.5a4.25 4.25 0 0 1 4.25 4.25v1.25M16 10V
+4m-3 3h6"
+              />
+            </svg>
+            参加する
+          </Link>
+        )}
       </header>
 
       <section className="arrange-detail__books" aria-labelledby="arrange-detail-books-title">
@@ -146,6 +231,22 @@ export default function ArrangeDetail() {
       </section>
     </section>
   );
+}
+
+async function fetchParticipant(id: string, userId: string): Promise<boolean> {
+  const response = await apiClient.arrangements[":id"].participants[":userId"].$get({
+    param: { id, userId },
+  });
+
+  if (response.status === 404) {
+    return false;
+  }
+
+  if (!response.ok) {
+    throw new Error("参加状態を確認できませんでした。");
+  }
+
+  return true;
 }
 
 function readingStatusLabel(status: "unread" | "partially-read" | "read"): string {

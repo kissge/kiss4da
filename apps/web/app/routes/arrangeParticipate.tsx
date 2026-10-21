@@ -45,6 +45,7 @@ export default function ArrangeParticipate() {
   const [books, setBooks] = useState<BookFormValues[]>([]);
   const [editingBook, setEditingBook] = useState<BookFormValues | null>(null);
   const [participantName, setParticipantName] = useState("");
+  const [participantId, setParticipantId] = useState<string | null>(null);
   const [autoFilledCount, setAutoFilledCount] = useState(0);
   const [savedBookCount, setSavedBookCount] = useState(0);
   const [reflectToBookshelf, setReflectToBookshelf] = useState(true);
@@ -58,11 +59,14 @@ export default function ArrangeParticipate() {
       return;
     }
 
-    void fetchArrangement(id)
-      .then((result) => {
+    const userId = getOrCreateInternalId();
+    void Promise.all([fetchArrangement(id), fetchParticipant(id, userId)])
+      .then(([result, participant]) => {
         const savedBooks = listSavedBooks();
         const savedBookIds = new Set(savedBooks.map((book) => book.id));
         setArrangement(result);
+        setParticipantId(participant?.participantId ?? null);
+        setParticipantName(participant?.participantName ?? "");
         setSavedBookCount(savedBooks.length);
         setBooks(
           result.books.map((book) =>
@@ -72,6 +76,18 @@ export default function ArrangeParticipate() {
             ),
           ),
         );
+        if (participant) {
+          setBooks(
+            result.books.map((book) => {
+              const values = createBookValues(
+                book,
+                savedBooks.find((savedBook) => savedBook.id === book.id),
+              );
+              const participantBook = participant.books.find((item) => item.id === book.id);
+              return participantBook ? { ...values, ...participantBook } : values;
+            }),
+          );
+        }
         setAutoFilledCount(result.books.filter((book) => savedBookIds.has(book.id)).length);
       })
       .catch((reason: unknown) => {
@@ -97,19 +113,25 @@ export default function ArrangeParticipate() {
     setIsSubmitting(true);
 
     try {
-      const response = await apiClient.arrangements[":id"].participants.$post({
-        param: { id: arrangement.id },
-        json: {
-          participantName: participantName.trim(),
-          participantUserId: getOrCreateInternalId(),
-          books: books.map((book) => ({
-            id: book.id,
-            readingStatus: book.readingStatus,
-            readRange: book.readRange,
-            readDate: book.readDate,
-          })),
-        },
-      });
+      const json = {
+        participantName: participantName.trim(),
+        participantUserId: getOrCreateInternalId(),
+        books: books.map((book) => ({
+          id: book.id,
+          readingStatus: book.readingStatus,
+          readRange: book.readRange,
+          readDate: book.readDate,
+        })),
+      };
+      const response = participantId
+        ? await apiClient.arrangements[":id"].participants[":userId"].$put({
+            param: { id: arrangement.id, userId: getOrCreateInternalId() },
+            json,
+          })
+        : await apiClient.arrangements[":id"].participants.$post({
+            param: { id: arrangement.id },
+            json,
+          });
 
       if (!response.ok) {
         const body = (await response.json()) as { message?: string };
@@ -176,7 +198,10 @@ export default function ArrangeParticipate() {
         ← {arrangement.title}へ戻る
       </Link>
       <header className="page-header arrange-participate__header">
-        <h1 className="page__title">{arrangement.title}に参加する</h1>
+        <h1 className="page__title">
+          {arrangement.title}
+          {participantId ? "の読了状況を編集する" : "に参加する"}
+        </h1>
         <p className="page__description">あなたの読了状況を入力してください。</p>
       </header>
 
@@ -274,7 +299,13 @@ export default function ArrangeParticipate() {
           className="question-book-form__button"
           disabled={isSubmitting || !participantName.trim()}
         >
-          {isSubmitting ? "参加中..." : "参加する"}
+          {isSubmitting
+            ? participantId
+              ? "更新中..."
+              : "参加中..."
+            : participantId
+              ? "更新する"
+              : "参加する"}
         </button>
       </form>
 
@@ -301,6 +332,22 @@ async function fetchArrangement(id: string) {
     throw new Error(
       response.status === 404 ? "調整が見つかりませんでした。" : "調整を読み込めませんでした。",
     );
+  }
+
+  return response.json();
+}
+
+async function fetchParticipant(id: string, userId: string) {
+  const response = await apiClient.arrangements[":id"].participants[":userId"].$get({
+    param: { id, userId },
+  });
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new Error("参加状況を読み込めませんでした。");
   }
 
   return response.json();
