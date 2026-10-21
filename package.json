@@ -11,6 +11,7 @@
     "api:db:create": "pnpm --filter @kiss4da/api db:create",
     "api:db:migrate:local": "pnpm --filter @kiss4da/api db:migrate:local",
     "api:db:migrate:remote": "pnpm --filter @kiss4da/api db:migrate:remote",
+    "api:db:exec": "pnpm --filter @kiss4da/api db:exec",
     "api:start": "pnpm --filter @kiss4da/api start",
     "api:typecheck": "pnpm --filter @kiss4da/api typecheck",
     "api:worker:dev": "pnpm --filter @kiss4da/api worker:dev",

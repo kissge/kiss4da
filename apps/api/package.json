@@ -15,6 +15,7 @@
     "db:create": "wrangler d1 create kiss4da",
     "db:migrate:local": "wrangler d1 migrations apply kiss4da --local",
     "db:migrate:remote": "wrangler d1 migrations apply kiss4da --remote",
+    "db:exec": "wrangler d1 execute kiss4da",
     "dev": "tsx watch src/server.ts",
     "deploy": "wrangler deploy",
     "start": "node dist/server.js",
