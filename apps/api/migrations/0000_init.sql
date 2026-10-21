@@ -46,3 +46,49 @@ CREATE INDEX IF NOT EXISTS arrangement_books_arrangement_position_idx
 
 CREATE INDEX IF NOT EXISTS arrangement_unknown_books_arrangement_idx
   ON arrangement_unknown_books (arrangement_id);
+
+CREATE TABLE IF NOT EXISTS arrangement_participants (
+  participant_id TEXT PRIMARY KEY NOT NULL,
+  arrangement_id TEXT NOT NULL,
+  participant_name TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE (arrangement_id, participant_name),
+  FOREIGN KEY (arrangement_id) REFERENCES arrangements (participant_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS arrangement_participant_books (
+  participant_id TEXT NOT NULL,
+  arrangement_id TEXT NOT NULL,
+  book_id TEXT NOT NULL,
+  reading_status TEXT NOT NULL DEFAULT 'unread'
+    CHECK (reading_status IN ('unread', 'partially-read', 'read')),
+  read_range TEXT NOT NULL DEFAULT '',
+  read_date TEXT,
+  PRIMARY KEY (participant_id, arrangement_id, book_id),
+  FOREIGN KEY (participant_id) REFERENCES arrangement_participants (participant_id) ON DELETE CASCADE,
+  FOREIGN KEY (arrangement_id, book_id) REFERENCES arrangement_books (arrangement_id, book_id)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS arrangement_participant_unknown_books (
+  participant_id TEXT NOT NULL,
+  arrangement_unknown_book_id TEXT NOT NULL,
+  reading_status TEXT NOT NULL DEFAULT 'unread'
+    CHECK (reading_status IN ('unread', 'partially-read', 'read')),
+  read_range TEXT NOT NULL DEFAULT '',
+  read_date TEXT,
+  PRIMARY KEY (participant_id, arrangement_unknown_book_id),
+  FOREIGN KEY (participant_id) REFERENCES arrangement_participants (participant_id) ON DELETE CASCADE,
+  FOREIGN KEY (arrangement_unknown_book_id) REFERENCES arrangement_unknown_books (id)
+    ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS arrangement_participants_arrangement_idx
+  ON arrangement_participants (arrangement_id);
+
+CREATE INDEX IF NOT EXISTS arrangement_participant_books_participant_idx
+  ON arrangement_participant_books (participant_id, arrangement_id);
+
+CREATE INDEX IF NOT EXISTS arrangement_participant_unknown_books_participant_idx
+  ON arrangement_participant_unknown_books (participant_id);
