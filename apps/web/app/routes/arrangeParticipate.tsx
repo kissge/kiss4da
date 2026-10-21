@@ -88,7 +88,7 @@ export default function ArrangeParticipate() {
   const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!arrangement) {
+    if (!arrangement || isSubmitting) {
       return;
     }
 
