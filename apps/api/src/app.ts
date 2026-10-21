@@ -22,6 +22,9 @@ const arrangementBookSchema = z.object({
   author: z.string().trim().default(""),
   url: z.string().trim().default(""),
   position: z.number().int().nonnegative(),
+  readingStatus: z.enum(["unread", "partially-read", "read"]).default("unread"),
+  readRange: z.string().default(""),
+  readDate: z.string().default(""),
 });
 
 const createArrangementSchema = z
@@ -253,8 +256,10 @@ const app = new Hono<{ Bindings: ApiBindings }>()
     const input = c.req.valid("json");
     const database = getDatabase(c.env);
     const arrangementId = nanoid();
+    const participantId = nanoid();
     const now = new Date().toISOString();
     const existingBookIds = new Set<string>();
+    const unknownBookIds = new Map<string, string>();
 
     for (const book of input.books) {
       const existingBook = await database
@@ -283,6 +288,13 @@ const app = new Hono<{ Bindings: ApiBindings }>()
           input.description,
           now,
         ),
+      database
+        .prepare(
+          `INSERT INTO arrangement_participants
+             (participant_id, arrangement_id, participant_name, user_id, created_at, updated_at)
+           VALUES (?1, ?2, ?3, ?4, ?5, ?5)`,
+        )
+        .bind(participantId, arrangementId, input.organizerName, input.organizerUserId, now),
       ...input.books.map((book) => {
         if (existingBookIds.has(book.id)) {
           return database
@@ -293,21 +305,54 @@ const app = new Hono<{ Bindings: ApiBindings }>()
             .bind(arrangementId, book.id, book.position);
         }
 
+        const unknownBookId = crypto.randomUUID();
+        unknownBookIds.set(book.id, unknownBookId);
+
         return database
           .prepare(
             `INSERT INTO arrangement_unknown_books
                (id, arrangement_id, position, title, author, url)
              VALUES (?1, ?2, ?3, ?4, ?5, ?6)`,
           )
-          .bind(
-            crypto.randomUUID(),
-            arrangementId,
-            book.position,
-            book.title,
-            book.author,
-            book.url,
-          );
+          .bind(unknownBookId, arrangementId, book.position, book.title, book.author, book.url);
       }),
+      ...input.books.map((book) =>
+        database
+          .prepare(
+            `INSERT INTO arrangement_participant_books
+               (participant_id, arrangement_id, book_id, reading_status, read_range, read_date)
+             SELECT ?1, ?2, ?3, ?4, ?5, ?6
+             WHERE EXISTS (
+               SELECT 1 FROM arrangement_books
+               WHERE arrangement_id = ?2 AND book_id = ?3
+             )`,
+          )
+          .bind(
+            participantId,
+            arrangementId,
+            book.id,
+            book.readingStatus,
+            book.readRange,
+            book.readDate,
+          ),
+      ),
+      ...input.books
+        .filter((book) => unknownBookIds.has(book.id))
+        .map((book) =>
+          database
+            .prepare(
+              `INSERT INTO arrangement_participant_unknown_books
+                 (participant_id, arrangement_unknown_book_id, reading_status, read_range, read_date)
+               VALUES (?1, ?2, ?3, ?4, ?5)`,
+            )
+            .bind(
+              participantId,
+              unknownBookIds.get(book.id),
+              book.readingStatus,
+              book.readRange,
+              book.readDate,
+            ),
+        ),
     ];
 
     await database.batch(statements);

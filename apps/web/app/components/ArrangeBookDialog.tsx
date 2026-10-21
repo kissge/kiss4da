@@ -78,7 +78,7 @@ export function ArrangeBookDialog({ values, onChange, onClose, onSave }: Arrange
             />
           </label>
           <fieldset className="reading-status">
-            <legend>読んだ状況</legend>
+            <legend>あなたの読んだ状況</legend>
             <div className="reading-status__options">
               {readingStatuses.map(([value, label]) => (
                 <label
@@ -98,7 +98,7 @@ export function ArrangeBookDialog({ values, onChange, onClose, onSave }: Arrange
           </fieldset>
           {values.readingStatus === "partially-read" && (
             <label className="form-field">
-              <span>読んだ範囲</span>
+              <span>あなたの読んだ範囲</span>
               <input
                 value={values.readRange}
                 onChange={(event) => update("readRange", event.target.value)}

@@ -105,6 +105,9 @@ export default function ArrangeNew() {
             author: book.author,
             url: book.url,
             position,
+            readingStatus: book.readingStatus,
+            readRange: book.readRange,
+            readDate: book.readDate,
           })),
         },
       });
