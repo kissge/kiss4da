@@ -103,8 +103,7 @@ CREATE TABLE IF NOT EXISTS arrangement_read_books (
     CHECK (reading_status IN ('partially-read', 'read')),
   read_range TEXT NOT NULL DEFAULT '',
   PRIMARY KEY (arrangement_id, book_id),
-  FOREIGN KEY (arrangement_id, book_id) REFERENCES arrangement_books (arrangement_id, book_id)
-    ON DELETE CASCADE,
+  FOREIGN KEY (arrangement_id) REFERENCES arrangements (id) ON DELETE CASCADE,
   CHECK (
     (reading_status = 'partially-read' AND read_range <> '')
     OR (reading_status = 'read' AND read_range = '')

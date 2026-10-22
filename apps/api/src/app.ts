@@ -468,6 +468,10 @@ const app = new Hono<{ Bindings: ApiBindings }>()
       .prepare(
         `SELECT book_id AS bookId
            FROM arrangement_books
+           WHERE arrangement_id = ?1
+         UNION ALL
+         SELECT id AS bookId
+           FROM arrangement_unknown_books
            WHERE arrangement_id = ?1`,
       )
       .bind(arrangementId)

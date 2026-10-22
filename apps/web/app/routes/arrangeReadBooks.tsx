@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpenCheck } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
@@ -43,10 +43,9 @@ export default function ArrangeReadBooks() {
     void Promise.all([fetchArrangement(id), fetchReadBooks(id)])
       .then(([result, savedBooks]) => {
         const savedById = new Map(savedBooks.map((book) => [book.bookId, book]));
-        const registeredBooks = result.books.filter((book) => book.source === "registered");
         setArrangement(result);
         setBooks(
-          registeredBooks.map((book) => {
+          result.books.map((book) => {
             const saved = savedById.get(book.id);
             return (
               saved ?? {
@@ -138,7 +137,6 @@ export default function ArrangeReadBooks() {
             return (
               <article className="arrange-read-book" key={book.bookId}>
                 <div className="arrange-read-book__heading">
-                  <BookOpenCheck aria-hidden="true" />
                   <h2>{details.title}</h2>
                 </div>
                 {details.author && <p className="arrange-read-book__author">{details.author}</p>}
