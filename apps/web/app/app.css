@@ -611,11 +611,8 @@ body {
   margin-top: 1.75rem;
 }
 
-.arrange-detail__title-row {
-  align-items: flex-start;
-  display: flex;
-  gap: 0.75rem;
-  justify-content: space-between;
+.arrange-detail__summary {
+  display: flow-root;
 }
 
 .arrange-detail__copy-url {
@@ -644,11 +641,11 @@ body {
 }
 
 .arrange-detail__header-actions {
-  align-items: center;
+  float: right;
+  margin: 0 0 0.5rem 0.75rem;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  justify-content: flex-end;
+  flex-direction: column;
+  gap: 0.25em;
 }
 
 .arrange-detail__organizer {

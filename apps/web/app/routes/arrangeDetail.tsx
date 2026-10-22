@@ -113,8 +113,7 @@ export default function ArrangeDetail() {
         ← 調整一覧
       </Link>
       <header className="arrange-detail__header">
-        <div className="arrange-detail__title-row">
-          <h1 className="page__title">{arrangement.title}</h1>
+        <div className="arrange-detail__summary">
           <div className="arrange-detail__header-actions">
             {arrangement.organizerUserId === getOrCreateInternalId() && (
               <Link to={`/arrange/${arrangement.id}/edit`} className="arrange-detail__copy-url">
@@ -131,27 +130,30 @@ export default function ArrangeDetail() {
               URLをコピー
             </button>
           </div>
-        </div>
-        <p className="arrange-detail__organizer">{arrangement.organizerName}</p>
-        <p className="arrange-detail__date">
-          {formatDateOrFallback(arrangement.heldOn ?? "", "開催日未定")}
-        </p>
-        {arrangement.description && <p className="page__description">{arrangement.description}</p>}
-        {(() => {
-          const participantNames = [
-            ...new Set(
-              arrangement.books.flatMap((book) =>
-                book.participants.map((item) => item.participantName),
+          <h1 className="page__title">{arrangement.title}</h1>
+          <p className="arrange-detail__organizer">{arrangement.organizerName}</p>
+          <p className="arrange-detail__date">
+            {formatDateOrFallback(arrangement.heldOn ?? "", "開催日未定")}
+          </p>
+          {arrangement.description && (
+            <p className="page__description">{arrangement.description}</p>
+          )}
+          {(() => {
+            const participantNames = [
+              ...new Set(
+                arrangement.books.flatMap((book) =>
+                  book.participants.map((item) => item.participantName),
+                ),
               ),
-            ),
-          ];
+            ];
 
-          return participantNames.length > 0 ? (
-            <p className="arrange-detail__participants">
-              {participantNames.join("、")}（{participantNames.length}名）
-            </p>
-          ) : null;
-        })()}
+            return participantNames.length > 0 ? (
+              <p className="arrange-detail__participants">
+                {participantNames.join("、")}（{participantNames.length}名）
+              </p>
+            ) : null;
+          })()}
+        </div>
         {participantError && (
           <p className="form-error" role="alert">
             {participantError}
