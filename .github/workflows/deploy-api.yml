@@ -26,7 +26,7 @@ jobs:
       - run: >-
           pnpm --filter @kiss4da/api exec wrangler deploy
           --var
-          ALLOWED_ORIGINS:https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+          ALLOWED_ORIGINS:https://${{ github.repository_owner }}.github.io
           --var
           BOOKS_API_TOKEN:${{ secrets.BOOKS_API_TOKEN }}
         env:
