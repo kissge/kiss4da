@@ -519,6 +519,7 @@ body {
 .question-book-list__sort button + button {
   border-left: 1px solid #cbd5e1;
   padding-left: 0.5rem;
+  margin-left: 0.25rem;
 }
 
 .question-book-list__sort button:hover,
