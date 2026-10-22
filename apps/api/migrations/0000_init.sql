@@ -95,3 +95,21 @@ CREATE INDEX IF NOT EXISTS arrangement_participant_books_participant_idx
 
 CREATE INDEX IF NOT EXISTS arrangement_participant_unknown_books_participant_idx
   ON arrangement_participant_unknown_books (participant_id);
+
+CREATE TABLE IF NOT EXISTS arrangement_read_books (
+  arrangement_id TEXT NOT NULL,
+  book_id TEXT NOT NULL,
+  reading_status TEXT NOT NULL
+    CHECK (reading_status IN ('partially-read', 'read')),
+  read_range TEXT NOT NULL DEFAULT '',
+  PRIMARY KEY (arrangement_id, book_id),
+  FOREIGN KEY (arrangement_id, book_id) REFERENCES arrangement_books (arrangement_id, book_id)
+    ON DELETE CASCADE,
+  CHECK (
+    (reading_status = 'partially-read' AND read_range <> '')
+    OR (reading_status = 'read' AND read_range = '')
+  )
+);
+
+CREATE INDEX IF NOT EXISTS arrangement_read_books_arrangement_idx
+  ON arrangement_read_books (arrangement_id);
