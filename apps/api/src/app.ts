@@ -331,9 +331,21 @@ const app = new Hono<{ Bindings: ApiBindings }>()
         source: "registered" | "unknown";
       }>();
 
+    const { results: participants } = await database
+      .prepare(
+        `SELECT participant_id AS participantId, participant_name AS participantName
+         FROM arrangement_participants
+         WHERE arrangement_id = ?1`,
+      )
+      .bind(arrangementId)
+      .all<{
+        participantId: string;
+        participantName: string;
+      }>();
     const { results: participantBooks } = await database
       .prepare(
         `SELECT
+           ap.participant_id AS participantId,
            ap.participant_name AS participantName,
            apb.book_id AS bookId,
            apb.reading_status AS readingStatus,
@@ -344,6 +356,7 @@ const app = new Hono<{ Bindings: ApiBindings }>()
          WHERE apb.arrangement_id = ?1
          UNION ALL
          SELECT
+           ap.participant_id AS participantId,
            ap.participant_name AS participantName,
            apub.arrangement_unknown_book_id AS bookId,
            apub.reading_status AS readingStatus,
@@ -356,6 +369,7 @@ const app = new Hono<{ Bindings: ApiBindings }>()
       )
       .bind(arrangementId)
       .all<{
+        participantId: string;
         participantName: string;
         bookId: string;
         readingStatus: "unread" | "partially-read" | "read";
@@ -378,19 +392,30 @@ const app = new Hono<{ Bindings: ApiBindings }>()
         readRange: string;
       }>();
     const readBooksByBookId = new Map(readBooks.map((book) => [book.bookId, book]));
-    const participantBooksByBookId = new Map<string, typeof participantBooks>();
+    const participantBooksByBookId = new Map<
+      string,
+      Map<string, (typeof participantBooks)[number]>
+    >();
 
     for (const participantBook of participantBooks) {
-      const current = participantBooksByBookId.get(participantBook.bookId) ?? [];
-      current.push(participantBook);
+      const current = participantBooksByBookId.get(participantBook.bookId) ?? new Map();
+      current.set(participantBook.participantId, participantBook);
       participantBooksByBookId.set(participantBook.bookId, current);
     }
     const booksWithParticipants = books.map((book) => ({
       ...book,
       readBook: readBooksByBookId.get(book.id) ?? null,
-      participants: (participantBooksByBookId.get(book.id) ?? []).map(
-        ({ bookId: _bookId, ...participant }) => participant,
-      ),
+      participants: participants.map((participant) => {
+        const participantBook = participantBooksByBookId
+          .get(book.id)
+          ?.get(participant.participantId);
+        return {
+          participantName: participant.participantName,
+          readingStatus: participantBook?.readingStatus ?? "unread",
+          readRange: participantBook?.readRange ?? "",
+          readDate: participantBook?.readDate ?? null,
+        };
+      }),
     }));
 
     return c.json({ ...arrangement, books: booksWithParticipants });
