@@ -121,7 +121,7 @@ export default function ArrangeDetail() {
               className="arrange-detail__participate"
             >
               <Pencil aria-hidden="true" />
-              読了状況を編集する
+              自分の読了状況を編集する
             </Link>
             <button
               type="button"
@@ -144,7 +144,7 @@ export default function ArrangeDetail() {
         )}
         <Link to={`/arrange/${arrangement.id}/read-books`} className="arrange-detail__read-books">
           <BookOpenCheck aria-hidden="true" />
-          実際に当日読んだ問題集を記録する
+          実際に当日読まれた問題集を記録する
         </Link>
       </header>
 
