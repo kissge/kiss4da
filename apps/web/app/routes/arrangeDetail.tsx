@@ -269,9 +269,11 @@ export default function ArrangeDetail() {
                         <dt>{participant.participantName}</dt>
                         <dd>
                           <span
-                            className={`reading-status-badge reading-status-badge--${participant.readingStatus}`}
+                            className={`reading-status-badge reading-status-badge--${participant.hasReadingStatus ? participant.readingStatus : "unknown"}`}
                           >
-                            {readingStatusLabel(participant.readingStatus)}
+                            {participant.hasReadingStatus
+                              ? readingStatusLabel(participant.readingStatus)
+                              : "不明"}
                           </span>
                           {participant.readRange && <span>{participant.readRange}</span>}
                           {participant.readDate && (
@@ -315,16 +317,27 @@ function ReadingStatusSummary({
   participants,
 }: {
   participants: {
+    hasReadingStatus: boolean;
     readingStatus: "unread" | "partially-read" | "read";
   }[];
 }) {
   const counts = {
-    unread: participants.filter((item) => item.readingStatus === "unread").length,
-    "partially-read": participants.filter((item) => item.readingStatus === "partially-read").length,
-    read: participants.filter((item) => item.readingStatus === "read").length,
+    unknown: participants.filter((item) => !item.hasReadingStatus).length,
+    unread: participants.filter((item) => item.hasReadingStatus && item.readingStatus === "unread")
+      .length,
+    "partially-read": participants.filter(
+      (item) => item.hasReadingStatus && item.readingStatus === "partially-read",
+    ).length,
+    read: participants.filter((item) => item.hasReadingStatus && item.readingStatus === "read")
+      .length,
   };
 
   const summaries = [
+    counts.unknown > 0 && (
+      <span className="reading-status-badge reading-status-badge--unknown" key="unknown">
+        不明 {counts.unknown}
+      </span>
+    ),
     counts.unread > 0 && (
       <span className="reading-status-badge reading-status-badge--unread" key="unread">
         未読 {counts.unread}

@@ -414,6 +414,7 @@ const app = new Hono<{ Bindings: ApiBindings }>()
         return {
           participantName: participant.participantName,
           participantUserId: participant.participantUserId,
+          hasReadingStatus: Boolean(participantBook),
           readingStatus: participantBook?.readingStatus ?? "unread",
           readRange: participantBook?.readRange ?? "",
           readDate: participantBook?.readDate ?? null,
@@ -487,28 +488,26 @@ const app = new Hono<{ Bindings: ApiBindings }>()
           )
           .bind(unknownBookId, arrangementId, book.position, book.title, book.author, book.url);
       }),
-      ...input.books
-        .filter((book) => book.readingStatus !== "unread")
-        .map((book) =>
-          database
-            .prepare(
-              `INSERT INTO arrangement_participant_books
+      ...input.books.map((book) =>
+        database
+          .prepare(
+            `INSERT INTO arrangement_participant_books
                (participant_id, arrangement_id, book_id, reading_status, read_range, read_date)
              SELECT ?1, ?2, ?3, ?4, ?5, ?6
              WHERE EXISTS (
                SELECT 1 FROM arrangement_books
                WHERE arrangement_id = ?2 AND book_id = ?3
              )`,
-            )
-            .bind(
-              participantId,
-              arrangementId,
-              book.id,
-              book.readingStatus,
-              book.readRange,
-              book.readDate,
-            ),
-        ),
+          )
+          .bind(
+            participantId,
+            arrangementId,
+            book.id,
+            book.readingStatus,
+            book.readRange,
+            book.readDate,
+          ),
+      ),
       ...input.books
         .filter((book) => unknownBookIds.has(book.id))
         .map((book) =>
@@ -551,6 +550,18 @@ const app = new Hono<{ Bindings: ApiBindings }>()
     if (arrangement.organizerUserId !== input.organizerUserId) {
       return c.json({ message: "この調整を編集する権限がありません。" }, 403);
     }
+    const organizerParticipant = await database
+      .prepare(
+        `SELECT participant_id AS participantId
+         FROM arrangement_participants
+         WHERE arrangement_id = ? AND user_id = ?`,
+      )
+      .bind(arrangementId, input.organizerUserId)
+      .first<{ participantId: string }>();
+
+    if (!organizerParticipant) {
+      return c.json({ message: "主催者の参加情報が見つかりませんでした。" }, 409);
+    }
 
     const [{ results: registeredBooks }, { results: unknownBooks }] = await Promise.all([
       database
@@ -564,8 +575,18 @@ const app = new Hono<{ Bindings: ApiBindings }>()
     ]);
     const registeredBookIds = new Set(registeredBooks.map((book) => book.id));
     const unknownBookIds = new Set(unknownBooks.map((book) => book.id));
+    const { results: catalogBooks } = await database
+      .prepare(
+        `SELECT id
+         FROM books
+         WHERE id IN (${input.books.map(() => "?").join(", ")})`,
+      )
+      .bind(...input.books.map((book) => book.id))
+      .all<{ id: string }>();
+    const catalogBookIds = new Set(catalogBooks.map((book) => book.id));
+    const allRegisteredBookIds = new Set([...registeredBookIds, ...catalogBookIds]);
     const desiredRegisteredIds = new Set(
-      input.books.filter((book) => registeredBookIds.has(book.id)).map((book) => book.id),
+      input.books.filter((book) => allRegisteredBookIds.has(book.id)).map((book) => book.id),
     );
     const desiredUnknownIds = new Set(
       input.books.filter((book) => unknownBookIds.has(book.id)).map((book) => book.id),
@@ -608,7 +629,7 @@ const app = new Hono<{ Bindings: ApiBindings }>()
             .bind(arrangementId, book.id),
         ),
       ...input.books.map((book) => {
-        if (registeredBookIds.has(book.id)) {
+        if (allRegisteredBookIds.has(book.id)) {
           return database
             .prepare(
               `INSERT INTO arrangement_books (arrangement_id, book_id, position)
@@ -631,55 +652,47 @@ const app = new Hono<{ Bindings: ApiBindings }>()
           )
           .bind(unknownBookId, arrangementId, book.position, book.title, book.author, book.url);
       }),
-      database
-        .prepare(
-          "DELETE FROM arrangement_participant_books WHERE participant_id IN (SELECT participant_id FROM arrangement_participants WHERE arrangement_id = ? AND user_id = ?)",
-        )
-        .bind(arrangementId, input.organizerUserId),
-      database
-        .prepare(
-          "DELETE FROM arrangement_participant_unknown_books WHERE participant_id IN (SELECT participant_id FROM arrangement_participants WHERE arrangement_id = ? AND user_id = ?)",
-        )
-        .bind(arrangementId, input.organizerUserId),
       ...input.books
-        .filter((book) => book.readingStatus !== "unread" && registeredBookIds.has(book.id))
+        .filter((book) => allRegisteredBookIds.has(book.id))
         .map((book) =>
           database
             .prepare(
               `INSERT INTO arrangement_participant_books
                  (participant_id, arrangement_id, book_id, reading_status, read_range, read_date)
-               SELECT participant_id, ?, ?, ?, ?, ?
-               FROM arrangement_participants
-               WHERE arrangement_id = ? AND user_id = ?`,
+               VALUES (?, ?, ?, ?, ?, ?)
+               ON CONFLICT(participant_id, arrangement_id, book_id) DO UPDATE SET
+                 reading_status = excluded.reading_status,
+                 read_range = excluded.read_range,
+                 read_date = excluded.read_date`,
             )
             .bind(
+              organizerParticipant.participantId,
               arrangementId,
               book.id,
               book.readingStatus,
               book.readRange,
               book.readDate || null,
-              arrangementId,
-              input.organizerUserId,
             ),
         ),
       ...input.books
-        .filter((book) => book.readingStatus !== "unread" && !registeredBookIds.has(book.id))
+        .filter((book) => !allRegisteredBookIds.has(book.id))
         .map((book) =>
           database
             .prepare(
               `INSERT INTO arrangement_participant_unknown_books
                  (participant_id, arrangement_unknown_book_id, reading_status, read_range, read_date)
-               SELECT participant_id, ?, ?, ?, ?
-               FROM arrangement_participants
-               WHERE arrangement_id = ? AND user_id = ?`,
+               VALUES (?, ?, ?, ?, ?)
+               ON CONFLICT(participant_id, arrangement_unknown_book_id) DO UPDATE SET
+                 reading_status = excluded.reading_status,
+                 read_range = excluded.read_range,
+                 read_date = excluded.read_date`,
             )
             .bind(
+              organizerParticipant.participantId,
               unknownIdsByInputId.get(book.id),
               book.readingStatus,
               book.readRange,
               book.readDate || null,
-              arrangementId,
-              input.organizerUserId,
             ),
         ),
     ];

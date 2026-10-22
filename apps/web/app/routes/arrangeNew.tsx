@@ -82,7 +82,9 @@ export default function ArrangeNew() {
         setBooks(
           arrangement.books.map((book) => {
             const participant = book.participants.find(
-              (item) => item.participantUserId === arrangement.organizerUserId,
+              (item) =>
+                item.participantUserId === arrangement.organizerUserId ||
+                item.participantName === arrangement.organizerName,
             );
             return {
               ...book,

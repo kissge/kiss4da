@@ -1237,6 +1237,10 @@ body {
   background: #2563eb;
 }
 
+.reading-status-badge--unknown {
+  background: #94a3b8;
+}
+
 .bottom-tab-bar {
   background: rgb(255 255 255 / 0.92);
   border-top: 1px solid #e2e8f0;
