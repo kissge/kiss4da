@@ -87,7 +87,9 @@ export default function ArrangeReadBooks() {
         throw new Error(body.message ?? "読書記録を保存できませんでした。");
       }
 
-      navigate(`/arrange/${arrangement.id}`);
+      navigate(`/arrange/${arrangement.id}`, {
+        state: { toast: "当日の読書記録を保存しました。" },
+      });
     } catch (reason: unknown) {
       setSubmitError(reason instanceof Error ? reason.message : "読書記録を保存できませんでした。");
     } finally {

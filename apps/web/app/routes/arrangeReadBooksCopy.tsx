@@ -70,7 +70,7 @@ export default function ArrangeReadBooksCopy() {
         else saveBook(values);
       }
 
-      navigate(`/arrange/${arrangement.id}`);
+      navigate(`/arrange/${arrangement.id}`, { state: { toast: "本棚にコピーしました。" } });
     } catch (reason: unknown) {
       setError(reason instanceof Error ? reason.message : "本棚へのコピーに失敗しました。");
       setIsSubmitting(false);

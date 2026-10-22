@@ -170,7 +170,9 @@ export default function ArrangeParticipate() {
       }
 
       saveUserName(participantName.trim());
-      navigate(`/arrange/${arrangement.id}`);
+      navigate(`/arrange/${arrangement.id}`, {
+        state: { toast: participantId ? "読了状況を更新しました。" : "調整に参加しました。" },
+      });
     } catch (reason: unknown) {
       setSubmitError(reason instanceof Error ? reason.message : "調整への参加に失敗しました。");
     } finally {

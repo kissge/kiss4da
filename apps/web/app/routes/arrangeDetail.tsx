@@ -5,6 +5,7 @@ import { Link, useParams } from "react-router";
 import { apiClient } from "../lib/apiClient";
 import { formatDateForDisplay, formatDateOrFallback } from "../lib/date";
 import { getOrCreateInternalId } from "../lib/internalId";
+import { setPendingToast } from "../lib/toast";
 
 export function meta() {
   return [
@@ -55,6 +56,7 @@ export default function ArrangeDetail() {
         throw new Error(body.message ?? "調整から抜けられませんでした。");
       }
 
+      setPendingToast("調整から抜けました。");
       window.location.reload();
     } catch (reason: unknown) {
       setParticipantError(

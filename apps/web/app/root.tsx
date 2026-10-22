@@ -4,15 +4,18 @@ import {
   Links,
   Meta,
   Outlet,
+  useLocation,
+  useNavigate,
   Scripts,
   ScrollRestoration,
 } from "react-router";
-
-import type { Route } from "./+types/root";
+import { Toaster, toast } from "sonner";
 
 import "./app.css";
+import type { Route } from "./+types/root";
 import { BottomTabBar } from "./components/BottomTabBar";
 import { getOrCreateInternalId } from "./lib/internalId";
+import { consumePendingToast } from "./lib/toast";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -46,9 +49,23 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   useEffect(() => {
     getOrCreateInternalId();
   }, []);
+
+  useEffect(() => {
+    const state = location.state as { toast?: string } | null;
+    const message = state?.toast ?? consumePendingToast();
+    if (!message) return;
+
+    toast.success(message);
+    if (state?.toast) {
+      navigate(location.pathname + location.search, { replace: true, state: null });
+    }
+  }, [location, navigate]);
 
   return (
     <div className="app-shell">
@@ -56,6 +73,7 @@ export default function App() {
         <Outlet />
       </main>
       <BottomTabBar />
+      <Toaster position="top-center" />
     </div>
   );
 }

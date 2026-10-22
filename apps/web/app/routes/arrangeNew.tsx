@@ -127,7 +127,7 @@ export default function ArrangeNew() {
         heldOn,
       });
       saveUserName(organizerName.trim());
-      navigate(`/arrange/${result.id}`);
+      navigate(`/arrange/${result.id}`, { state: { toast: "調整を作成しました。" } });
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "調整の作成に失敗しました。");
     } finally {
