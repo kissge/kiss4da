@@ -788,6 +788,24 @@ body {
   margin-top: 0.75rem;
 }
 
+.arrange-detail__read-book {
+  border-top: 1px solid #dbeafe;
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.65rem;
+  padding-top: 0.55rem;
+}
+
+.arrange-detail__read-book > span {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.arrange-detail__read-book .question-book-card__details {
+  margin-top: 0;
+}
+
 .arrange-detail__reading-details {
   border-left: 2px solid #dbeafe;
   box-sizing: border-box;

@@ -278,6 +278,22 @@ const app = new Hono<{ Bindings: ApiBindings }>()
         readRange: string;
         readDate: string | null;
       }>();
+    const { results: readBooks } = await database
+      .prepare(
+        `SELECT
+           book_id AS bookId,
+           reading_status AS readingStatus,
+           read_range AS readRange
+         FROM arrangement_read_books
+         WHERE arrangement_id = ?1`,
+      )
+      .bind(arrangementId)
+      .all<{
+        bookId: string;
+        readingStatus: "partially-read" | "read";
+        readRange: string;
+      }>();
+    const readBooksByBookId = new Map(readBooks.map((book) => [book.bookId, book]));
     const participantBooksByBookId = new Map<string, typeof participantBooks>();
 
     for (const participantBook of participantBooks) {
@@ -287,6 +303,7 @@ const app = new Hono<{ Bindings: ApiBindings }>()
     }
     const booksWithParticipants = books.map((book) => ({
       ...book,
+      readBook: readBooksByBookId.get(book.id) ?? null,
       participants: (participantBooksByBookId.get(book.id) ?? []).map(
         ({ bookId: _bookId, ...participant }) => participant,
       ),

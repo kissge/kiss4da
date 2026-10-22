@@ -82,6 +82,8 @@ export default function ArrangeDetail() {
     return <section className="page">読み込み中...</section>;
   }
 
+  const hasRecordedReadBooks = arrangement.books.some((book) => book.readBook);
+
   return (
     <section className="page">
       <Link to="/arrange" className="arrange-detail__back">
@@ -150,7 +152,7 @@ export default function ArrangeDetail() {
 
       <section className="arrange-detail__books" aria-labelledby="arrange-detail-books-title">
         <h2 id="arrange-detail-books-title" className="section-title">
-          読む本リスト
+          {hasRecordedReadBooks ? "読んだ本リスト" : "読む本リスト"}
         </h2>
         <div className="question-book-list__items">
           {arrangement.books.map((book) => (
@@ -172,6 +174,19 @@ export default function ArrangeDetail() {
                   <div className="question-book-card__info">
                     <h3>{book.title}</h3>
                     {book.author && <p>{book.author}</p>}
+                    {book.readBook && (
+                      <div className="arrange-detail__read-book">
+                        <span>当日読まれた記録</span>
+                        <div className="question-book-card__details">
+                          <span
+                            className={`reading-status-badge reading-status-badge--${book.readBook.readingStatus}`}
+                          >
+                            {readingStatusLabel(book.readBook.readingStatus)}
+                          </span>
+                          {book.readBook.readRange && <span>{book.readBook.readRange}</span>}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </a>
               </article>
@@ -243,17 +258,22 @@ function ReadingStatusSummary({
 
   const summaries = [
     counts.unread > 0 && (
-      <span className="reading-status-badge reading-status-badge--unread">
+      <span className="reading-status-badge reading-status-badge--unread" key="unread">
         未読 {counts.unread}
       </span>
     ),
     counts["partially-read"] > 0 && (
-      <span className="reading-status-badge reading-status-badge--partially-read">
+      <span
+        className="reading-status-badge reading-status-badge--partially-read"
+        key="partially-read"
+      >
         一部既読 {counts["partially-read"]}
       </span>
     ),
     counts.read > 0 && (
-      <span className="reading-status-badge reading-status-badge--read">既読 {counts.read}</span>
+      <span className="reading-status-badge reading-status-badge--read" key="read">
+        既読 {counts.read}
+      </span>
     ),
   ].filter(Boolean);
 
