@@ -1,6 +1,15 @@
-import { BookOpen, BookOpenCheck, DoorOpen, Pencil, UserRoundPlus, Users } from "lucide-react";
+import {
+  BookOpen,
+  BookOpenCheck,
+  Copy,
+  DoorOpen,
+  Pencil,
+  UserRoundPlus,
+  Users,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
+import { toast } from "sonner";
 
 import { apiClient } from "../lib/apiClient";
 import { formatDateForDisplay, formatDateOrFallback } from "../lib/date";
@@ -23,6 +32,7 @@ export default function ArrangeDetail() {
   const [isParticipant, setIsParticipant] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [participantError, setParticipantError] = useState<string | null>(null);
+  const [copyError, setCopyError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) {
@@ -67,6 +77,17 @@ export default function ArrangeDetail() {
     }
   };
 
+  const copyArrangementUrl = async () => {
+    setCopyError(null);
+
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success("URLをコピーしました。");
+    } catch (reason: unknown) {
+      setCopyError(reason instanceof Error ? reason.message : "URLをコピーできませんでした。");
+    }
+  };
+
   if (error) {
     return (
       <section className="page">
@@ -92,7 +113,17 @@ export default function ArrangeDetail() {
         ← 調整一覧
       </Link>
       <header className="arrange-detail__header">
-        <h1 className="page__title">{arrangement.title}</h1>
+        <div className="arrange-detail__title-row">
+          <h1 className="page__title">{arrangement.title}</h1>
+          <button
+            type="button"
+            className="arrange-detail__copy-url"
+            onClick={() => void copyArrangementUrl()}
+          >
+            <Copy aria-hidden="true" />
+            URLをコピー
+          </button>
+        </div>
         <p className="arrange-detail__organizer">{arrangement.organizerName}</p>
         <p className="arrange-detail__date">
           {formatDateOrFallback(arrangement.heldOn ?? "", "開催日未定")}
@@ -116,6 +147,11 @@ export default function ArrangeDetail() {
         {participantError && (
           <p className="form-error" role="alert">
             {participantError}
+          </p>
+        )}
+        {copyError && (
+          <p className="form-error" role="alert">
+            URLをコピーできませんでした。
           </p>
         )}
         {isParticipant ? (
