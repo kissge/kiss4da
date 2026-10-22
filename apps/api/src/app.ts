@@ -9,12 +9,40 @@ import { getDatabase } from "./db.js";
 
 export type ApiBindings = {
   ALLOWED_ORIGINS?: string;
+  BOOKS_API_TOKEN?: string;
   Database?: D1Database;
 };
 
 const booksQuerySchema = z.object({
   q: z.string().optional().default(""),
 });
+
+const upsertBookSchema = z
+  .object({
+    id: z.string().trim().min(1).optional(),
+    title: z.string().trim().min(1),
+    author: z.string().trim().default(""),
+    publishedAt: z.string().trim().default(""),
+    description: z.string().default(""),
+    url: z.string().trim().min(1),
+    thumbnailURL: z.string().trim().default(""),
+  })
+  .array()
+  .min(1)
+  .superRefine((books, context) => {
+    const urls = new Set<string>();
+
+    for (const [index, book] of books.entries()) {
+      if (urls.has(book.url)) {
+        context.addIssue({
+          code: "custom",
+          message: "同じURLの書籍が複数回送信されています。",
+          path: [index, "url"],
+        });
+      }
+      urls.add(book.url);
+    }
+  });
 
 const arrangementBookSchema = z.object({
   id: z.string().trim().min(1),
@@ -84,6 +112,23 @@ const participateArrangementSchema = z
 const participantUserIdParamSchema = z.object({
   userId: z.string().trim().min(1),
 });
+
+function requireBooksApiToken(c: {
+  env: ApiBindings;
+  req: { header: (name: string) => string | undefined };
+}) {
+  const configuredToken = c.env.BOOKS_API_TOKEN;
+  if (!configuredToken) {
+    throw new Error("BOOKS_API_TOKEN is not configured.");
+  }
+
+  const authorization = c.req.header("Authorization");
+  if (authorization !== `Bearer ${configuredToken}`) {
+    return false;
+  }
+
+  return true;
+}
 
 const readBooksSchema = z
   .object({
@@ -170,6 +215,45 @@ const app = new Hono<{ Bindings: ApiBindings }>()
       }>();
 
     return c.json({ results });
+  })
+  .post("/books", zValidator("json", z.object({ books: upsertBookSchema })), async (c) => {
+    if (!requireBooksApiToken(c)) {
+      return c.json({ message: "認証に失敗しました。" }, 401);
+    }
+
+    const { books } = c.req.valid("json");
+    const database = getDatabase(c.env);
+    const now = new Date().toISOString();
+
+    const statements = books.map((book) =>
+      database
+        .prepare(
+          `INSERT INTO books
+             (id, title, author, published_at, description, url, thumbnail_url, created_at, updated_at)
+           VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?8)
+           ON CONFLICT(url) DO UPDATE SET
+             title = excluded.title,
+             author = excluded.author,
+             published_at = excluded.published_at,
+             description = excluded.description,
+             thumbnail_url = excluded.thumbnail_url,
+             updated_at = excluded.updated_at`,
+        )
+        .bind(
+          book.id ?? nanoid(),
+          book.title,
+          book.author,
+          book.publishedAt || null,
+          book.description,
+          book.url,
+          book.thumbnailURL || null,
+          now,
+        ),
+    );
+
+    await database.batch(statements);
+
+    return c.json({ count: books.length, upserted: true });
   })
   .get("/arrangements/:id", async (c) => {
     const database = getDatabase(c.env);

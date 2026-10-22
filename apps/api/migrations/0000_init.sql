@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS books (
   author TEXT,
   published_at TEXT,
   description TEXT,
-  url TEXT,
+  url TEXT NOT NULL UNIQUE,
   thumbnail_url TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
