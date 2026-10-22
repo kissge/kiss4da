@@ -17,7 +17,7 @@ export default function Arrange() {
   const [arrangements, setArrangements] = useState<SavedArrangement[]>([]);
 
   useEffect(() => {
-    setArrangements(listSavedArrangements().toReversed());
+    setArrangements(listSavedArrangements());
   }, []);
 
   return (
