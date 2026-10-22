@@ -115,14 +115,22 @@ export default function ArrangeDetail() {
       <header className="arrange-detail__header">
         <div className="arrange-detail__title-row">
           <h1 className="page__title">{arrangement.title}</h1>
-          <button
-            type="button"
-            className="arrange-detail__copy-url"
-            onClick={() => void copyArrangementUrl()}
-          >
-            <Copy aria-hidden="true" />
-            URLをコピー
-          </button>
+          <div className="arrange-detail__header-actions">
+            {arrangement.organizerUserId === getOrCreateInternalId() && (
+              <Link to={`/arrange/${arrangement.id}/edit`} className="arrange-detail__copy-url">
+                <Pencil aria-hidden="true" />
+                調整を編集
+              </Link>
+            )}
+            <button
+              type="button"
+              className="arrange-detail__copy-url"
+              onClick={() => void copyArrangementUrl()}
+            >
+              <Copy aria-hidden="true" />
+              URLをコピー
+            </button>
+          </div>
         </div>
         <p className="arrange-detail__organizer">{arrangement.organizerName}</p>
         <p className="arrange-detail__date">

@@ -4,6 +4,7 @@ export default [
   index("routes/home.tsx"),
   route("arrange", "routes/arrange.tsx"),
   route("arrange/new", "routes/arrangeNew.tsx"),
+  route("arrange/:id/edit", "routes/arrangeNew.tsx", { id: "arrange-edit" }),
   route("arrange/:id", "routes/arrangeDetail.tsx"),
   route("arrange/:id/read-books", "routes/arrangeReadBooks.tsx"),
   route("arrange/:id/read-books/copy", "routes/arrangeReadBooksCopy.tsx"),

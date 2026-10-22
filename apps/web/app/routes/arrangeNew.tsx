@@ -1,6 +1,6 @@
 import { BookOpen, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 import { ArrangeBookDialog } from "../components/ArrangeBookDialog";
 import { QuestionBookSearch } from "../components/QuestionBookSearch";
@@ -48,6 +48,8 @@ function createArrangeBook(book: Book, savedBook?: SavedBook): BookFormValues {
 }
 
 export default function ArrangeNew() {
+  const { id } = useParams();
+  const isEditing = Boolean(id);
   const [savedBooks, setSavedBooks] = useState<SavedBook[]>([]);
   const [books, setBooks] = useState<BookFormValues[]>([]);
   const [editingBook, setEditingBook] = useState<BookFormValues | null>(null);
@@ -57,12 +59,48 @@ export default function ArrangeNew() {
   const [description, setDescription] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(isEditing);
   const navigate = useNavigate();
   const excludedBookIds = useMemo(() => books.map((book) => book.id), [books]);
 
   useEffect(() => {
     setSavedBooks(listSavedBooks());
   }, []);
+
+  useEffect(() => {
+    if (!id) return;
+
+    void fetchArrangement(id)
+      .then((arrangement) => {
+        if (arrangement.organizerUserId !== getOrCreateInternalId()) {
+          throw new Error("この調整を編集する権限がありません。");
+        }
+        setArrangementName(arrangement.title);
+        setOrganizerName(arrangement.organizerName);
+        setHeldOn(arrangement.heldOn ?? "");
+        setDescription(arrangement.description);
+        setBooks(
+          arrangement.books.map((book) => {
+            const participant = book.participants.find(
+              (item) => item.participantUserId === arrangement.organizerUserId,
+            );
+            return {
+              ...book,
+              thumbnailURL: book.thumbnailURL,
+              readingStatus: participant?.readingStatus ?? "unread",
+              readDate: participant?.readDate ?? "",
+              readSession: "",
+              readRange: participant?.readRange ?? "",
+              comment: "",
+            };
+          }),
+        );
+      })
+      .catch((error: unknown) => {
+        setSubmitError(error instanceof Error ? error.message : "調整を読み込めませんでした。");
+      })
+      .finally(() => setIsLoading(false));
+  }, [id]);
 
   const addBook = (book: Book) => {
     const savedBook = savedBooks.find((saved) => saved.id === book.id);
@@ -94,25 +132,26 @@ export default function ArrangeNew() {
     setIsSubmitting(true);
 
     try {
-      const response = await apiClient.arrangements.$post({
-        json: {
-          title: arrangementName.trim(),
-          organizerName: organizerName.trim(),
-          organizerUserId: getOrCreateInternalId(),
-          heldOn,
-          description,
-          books: books.map((book, position) => ({
-            id: book.id,
-            title: book.title,
-            author: book.author,
-            url: book.url,
-            position,
-            readingStatus: book.readingStatus,
-            readRange: book.readRange,
-            readDate: book.readDate,
-          })),
-        },
-      });
+      const payload = {
+        title: arrangementName.trim(),
+        organizerName: organizerName.trim(),
+        organizerUserId: getOrCreateInternalId(),
+        heldOn,
+        description,
+        books: books.map((book, position) => ({
+          id: book.id,
+          title: book.title,
+          author: book.author,
+          url: book.url,
+          position,
+          readingStatus: book.readingStatus,
+          readRange: book.readRange,
+          readDate: book.readDate,
+        })),
+      };
+      const response = isEditing
+        ? await apiClient.arrangements[":id"].$put({ param: { id: id! }, json: payload })
+        : await apiClient.arrangements.$post({ json: payload });
 
       if (!response.ok) {
         const errorBody = await response.text();
@@ -121,13 +160,15 @@ export default function ArrangeNew() {
 
       const result = await response.json();
       saveArrangement({
-        id: result.id,
+        id: isEditing ? id! : result.id,
         title: arrangementName.trim(),
         organizerName: organizerName.trim(),
         heldOn,
       });
       saveUserName(organizerName.trim());
-      navigate(`/arrange/${result.id}`, { state: { toast: "調整を作成しました。" } });
+      navigate(`/arrange/${isEditing ? id : result.id}`, {
+        state: { toast: isEditing ? "調整を更新しました。" : "調整を作成しました。" },
+      });
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "調整の作成に失敗しました。");
     } finally {
@@ -138,127 +179,137 @@ export default function ArrangeNew() {
   return (
     <section className="page">
       <header className="page-header">
-        <h1 className="page__title">調整を新規作成</h1>
+        <h1 className="page__title">{isEditing ? "調整を編集" : "調整を新規作成"}</h1>
       </header>
 
-      <form className="arrange-form" onSubmit={handleSubmit}>
-        <label className="form-field">
-          <span>会の名前</span>
-          <input
-            name="title"
-            type="text"
-            value={arrangementName}
-            onChange={(event) => setArrangementName(event.target.value)}
-          />
-        </label>
-        <label className="form-field">
-          <span>主催者の名前</span>
-          <input
-            name="author"
-            type="text"
-            value={organizerName}
-            onChange={(event) => setOrganizerName(event.target.value)}
-          />
-        </label>
-        <label className="form-field">
-          <span>開催日</span>
-          <input
-            name="heldOn"
-            type="date"
-            value={heldOn}
-            onChange={(event) => setHeldOn(event.target.value)}
-          />
-        </label>
-        <label className="form-field">
-          <span>説明</span>
-          <textarea
-            name="description"
-            rows={4}
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-          />
-        </label>
+      {isLoading ? (
+        <p>読み込み中...</p>
+      ) : (
+        <form className="arrange-form" onSubmit={handleSubmit}>
+          <label className="form-field">
+            <span>会の名前</span>
+            <input
+              name="title"
+              type="text"
+              value={arrangementName}
+              onChange={(event) => setArrangementName(event.target.value)}
+            />
+          </label>
+          <label className="form-field">
+            <span>主催者の名前</span>
+            <input
+              name="author"
+              type="text"
+              value={organizerName}
+              onChange={(event) => setOrganizerName(event.target.value)}
+            />
+          </label>
+          <label className="form-field">
+            <span>開催日</span>
+            <input
+              name="heldOn"
+              type="date"
+              value={heldOn}
+              onChange={(event) => setHeldOn(event.target.value)}
+            />
+          </label>
+          <label className="form-field">
+            <span>説明</span>
+            <textarea
+              name="description"
+              rows={4}
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+            />
+          </label>
 
-        {submitError && (
-          <p className="form-error" role="alert">
-            {submitError}
-          </p>
-        )}
+          {submitError && (
+            <p className="form-error" role="alert">
+              {submitError}
+            </p>
+          )}
 
-        <section className="arrange-form__books" aria-labelledby="arrange-books-title">
-          <div className="arrange-form__section-heading">
-            <h2 id="arrange-books-title">読む本リスト</h2>
-            <span>{books.length}冊</span>
-          </div>
-          <QuestionBookSearch
-            savedBooks={savedBooks}
-            onSelectBook={addBook}
-            onAddBook={addBookFromQuery}
-            excludedBookIds={excludedBookIds}
-          />
-          <div className="question-book-list__items">
-            {books.map((book) => (
-              <article className="question-book-card" key={book.id}>
-                <div className="question-book-card__link">
-                  {book.thumbnailURL ? (
-                    <img src={book.thumbnailURL} alt="" className="question-book-card__thumbnail" />
-                  ) : (
-                    <div className="question-book-card__thumbnail-placeholder" aria-hidden="true">
-                      <BookOpen />
-                    </div>
-                  )}
-                  <div className="question-book-card__info">
-                    <h3>{book.title}</h3>
-                    {book.author && <p>{book.author}</p>}
-                    <div className="question-book-card__details">
-                      <span
-                        className={`reading-status-badge reading-status-badge--${book.readingStatus}`}
-                      >
-                        {book.readingStatus === "unread"
-                          ? "未読"
-                          : book.readingStatus === "read"
-                            ? "既読"
-                            : "一部既読"}
-                      </span>
-                      {book.readRange && <span>{book.readRange}</span>}
+          <section className="arrange-form__books" aria-labelledby="arrange-books-title">
+            <div className="arrange-form__section-heading">
+              <h2 id="arrange-books-title">読む本リスト</h2>
+              <span>{books.length}冊</span>
+            </div>
+            <QuestionBookSearch
+              savedBooks={savedBooks}
+              onSelectBook={addBook}
+              onAddBook={addBookFromQuery}
+              excludedBookIds={excludedBookIds}
+            />
+            <div className="question-book-list__items">
+              {books.map((book) => (
+                <article className="question-book-card" key={book.id}>
+                  <div className="question-book-card__link">
+                    {book.thumbnailURL ? (
+                      <img
+                        src={book.thumbnailURL}
+                        alt=""
+                        className="question-book-card__thumbnail"
+                      />
+                    ) : (
+                      <div className="question-book-card__thumbnail-placeholder" aria-hidden="true">
+                        <BookOpen />
+                      </div>
+                    )}
+                    <div className="question-book-card__info">
+                      <h3>{book.title}</h3>
+                      {book.author && <p>{book.author}</p>}
+                      <div className="question-book-card__details">
+                        <span
+                          className={`reading-status-badge reading-status-badge--${book.readingStatus}`}
+                        >
+                          {book.readingStatus === "unread"
+                            ? "未読"
+                            : book.readingStatus === "read"
+                              ? "既読"
+                              : "一部既読"}
+                        </span>
+                        {book.readRange && <span>{book.readRange}</span>}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="question-book-card__actions">
-                  <button
-                    type="button"
-                    className="question-book-card__edit"
-                    aria-label={`${book.title}を編集`}
-                    onClick={() => setEditingBook(book)}
-                  >
-                    <Pencil aria-hidden="true" />
-                  </button>
-                  <button
-                    type="button"
-                    className="question-book-card__delete"
-                    aria-label={`${book.title}を読む問題集リストから削除`}
-                    onClick={() =>
-                      setBooks((currentBooks) => currentBooks.filter((item) => item.id !== book.id))
-                    }
-                  >
-                    <Trash2 aria-hidden="true" />
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+                  <div className="question-book-card__actions">
+                    <button
+                      type="button"
+                      className="question-book-card__edit"
+                      aria-label={`${book.title}を編集`}
+                      onClick={() => setEditingBook(book)}
+                    >
+                      <Pencil aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      className="question-book-card__delete"
+                      aria-label={`${book.title}を読む問題集リストから削除`}
+                      onClick={() =>
+                        setBooks((currentBooks) =>
+                          currentBooks.filter((item) => item.id !== book.id),
+                        )
+                      }
+                    >
+                      <Trash2 aria-hidden="true" />
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
 
-        <button
-          type="submit"
-          className="question-book-form__button"
-          disabled={
-            isSubmitting || !arrangementName.trim() || !organizerName.trim() || books.length === 0
-          }
-        >
-          {isSubmitting ? "作成中..." : "作成"}
-        </button>
-      </form>
+          <button
+            type="submit"
+            className="question-book-form__button"
+            disabled={
+              isSubmitting || !arrangementName.trim() || !organizerName.trim() || books.length === 0
+            }
+          >
+            {id ? (isSubmitting ? "更新中..." : "更新") : isSubmitting ? "作成中..." : "作成"}
+          </button>
+        </form>
+      )}
       {editingBook && (
         <ArrangeBookDialog
           values={editingBook}
@@ -269,4 +320,10 @@ export default function ArrangeNew() {
       )}
     </section>
   );
+}
+
+async function fetchArrangement(id: string) {
+  const response = await apiClient.arrangements[":id"].$get({ param: { id } });
+  if (!response.ok) throw new Error("調整を読み込めませんでした。");
+  return response.json();
 }
