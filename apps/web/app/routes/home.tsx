@@ -7,10 +7,7 @@ import { listSavedBooks } from "../lib/bookRepository";
 import type { Book, BookFormValues, SavedBook } from "../lib/types";
 
 export function meta() {
-  return [
-    { title: "問題集管理 | kiss4da" },
-    { name: "description", content: "問題集を管理します。" },
-  ];
+  return [{ title: "本棚 | kiss4da" }, { name: "description", content: "問題集を管理します。" }];
 }
 
 export default function Home() {

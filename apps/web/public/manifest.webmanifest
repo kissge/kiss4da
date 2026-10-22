@@ -1,0 +1,19 @@
+{
+  "name": "kiss4da",
+  "short_name": "kiss4da",
+  "description": "クイズの問題集管理と押し会で読む問題集の調整を簡単に行えます",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "theme_color": "#2563eb",
+  "background_color": "#f8fafc",
+  "icons": [
+    {
+      "src": "https://kissge.github.io/favicon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

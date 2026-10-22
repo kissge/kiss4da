@@ -18,6 +18,9 @@ import { getOrCreateInternalId } from "./lib/internalId";
 import { consumePendingToast } from "./lib/toast";
 
 export const links: Route.LinksFunction = () => [
+  { rel: "manifest", href: `${import.meta.env.BASE_URL}manifest.webmanifest` },
+  { rel: "icon", href: "https://kissge.github.io/favicon.png", type: "image/png" },
+  { rel: "apple-touch-icon", href: "https://kissge.github.io/favicon.png" },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -29,6 +32,15 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
 ];
+
+export function meta() {
+  return [
+    { name: "theme-color", content: "#2563eb" },
+    { name: "mobile-web-app-capable", content: "yes" },
+    { name: "apple-mobile-web-app-capable", content: "yes" },
+    { name: "apple-mobile-web-app-title", content: "kiss4da" },
+  ];
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -54,6 +66,16 @@ export default function App() {
 
   useEffect(() => {
     getOrCreateInternalId();
+  }, []);
+
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+
+    void navigator.serviceWorker
+      .register(`${import.meta.env.BASE_URL}sw.js`)
+      .catch((reason: unknown) => {
+        console.error("Service Workerの登録に失敗しました。", reason);
+      });
   }, []);
 
   useEffect(() => {
