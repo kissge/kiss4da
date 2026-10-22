@@ -1068,16 +1068,14 @@ body {
 }
 
 .question-book-card {
-  align-items: flex-start;
   box-sizing: border-box;
   border: 1px solid #e2e8f0;
   border-radius: 0.85rem;
   background: white;
   color: inherit;
   cursor: pointer;
-  display: flex;
+  display: flow-root;
   font: inherit;
-  gap: 0.75rem;
   min-width: 0;
   padding: 0.75rem;
   text-align: left;
@@ -1089,13 +1087,25 @@ body {
 }
 
 .question-book-card__link {
-  align-items: flex-start;
   color: inherit;
-  display: flex;
-  flex: 1 1 0;
-  gap: 0.75rem;
+  display: block;
   min-width: 0;
   text-decoration: none;
+}
+
+.question-book-card__content {
+  min-width: 0;
+}
+
+.question-book-card__content > .question-book-card__thumbnail,
+.question-book-card__content > .question-book-card__thumbnail-placeholder {
+  float: left;
+  margin: 0 0.75rem 0.5rem 0;
+}
+
+.question-book-card__info {
+  overflow: visible;
+  width: auto;
 }
 
 .question-book-card:hover,
@@ -1119,10 +1129,7 @@ body {
 }
 
 .question-book-card__info {
-  flex: 1 1 0;
   min-width: 0;
-  overflow: hidden;
-  width: 0;
 }
 
 .question-book-card__info h3 {
@@ -1163,6 +1170,7 @@ body {
 
 .question-book-card__details {
   align-items: center;
+  clear: left;
   display: flex;
   flex-wrap: wrap;
   font-size: 0.78rem;
@@ -1202,9 +1210,10 @@ body {
 }
 
 .question-book-card__actions {
+  float: right;
   display: flex;
-  flex: 0 0 auto;
   gap: 0.15rem;
+  margin: -0.25rem -0.25rem 0 0.5rem;
 }
 
 .question-book-card__delete {

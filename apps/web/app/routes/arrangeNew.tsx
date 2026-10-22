@@ -245,35 +245,6 @@ export default function ArrangeNew() {
             <div className="question-book-list__items">
               {books.map((book) => (
                 <article className="question-book-card" key={book.id}>
-                  <div className="question-book-card__link">
-                    {book.thumbnailURL ? (
-                      <img
-                        src={book.thumbnailURL}
-                        alt=""
-                        className="question-book-card__thumbnail"
-                      />
-                    ) : (
-                      <div className="question-book-card__thumbnail-placeholder" aria-hidden="true">
-                        <BookOpen />
-                      </div>
-                    )}
-                    <div className="question-book-card__info">
-                      <h3>{book.title}</h3>
-                      {book.author && <p>{book.author}</p>}
-                      <div className="question-book-card__details">
-                        <span
-                          className={`reading-status-badge reading-status-badge--${book.readingStatus}`}
-                        >
-                          {book.readingStatus === "unread"
-                            ? "未読"
-                            : book.readingStatus === "read"
-                              ? "既読"
-                              : "一部既読"}
-                        </span>
-                        {book.readRange && <span>{book.readRange}</span>}
-                      </div>
-                    </div>
-                  </div>
                   <div className="question-book-card__actions">
                     <button
                       type="button"
@@ -295,6 +266,40 @@ export default function ArrangeNew() {
                     >
                       <Trash2 aria-hidden="true" />
                     </button>
+                  </div>
+                  <div className="question-book-card__link">
+                    <div className="question-book-card__content">
+                      {book.thumbnailURL ? (
+                        <img
+                          src={book.thumbnailURL}
+                          alt=""
+                          className="question-book-card__thumbnail"
+                        />
+                      ) : (
+                        <div
+                          className="question-book-card__thumbnail-placeholder"
+                          aria-hidden="true"
+                        >
+                          <BookOpen />
+                        </div>
+                      )}
+                      <div className="question-book-card__info">
+                        <h3>{book.title}</h3>
+                        {book.author && <p>{book.author}</p>}
+                        <div className="question-book-card__details">
+                          <span
+                            className={`reading-status-badge reading-status-badge--${book.readingStatus}`}
+                          >
+                            {book.readingStatus === "unread"
+                              ? "未読"
+                              : book.readingStatus === "read"
+                                ? "既読"
+                                : "一部既読"}
+                          </span>
+                          {book.readRange && <span>{book.readRange}</span>}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </article>
               ))}

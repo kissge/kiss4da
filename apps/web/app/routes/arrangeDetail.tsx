@@ -255,38 +255,44 @@ export default function ArrangeDetail() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  {book.thumbnailURL ? (
-                    <img src={book.thumbnailURL} alt="" className="question-book-card__thumbnail" />
-                  ) : (
-                    <div className="question-book-card__thumbnail-placeholder" aria-hidden="true">
-                      <BookOpen />
-                    </div>
-                  )}
-                  <div className="question-book-card__info">
-                    <h3>{book.title}</h3>
-                    {(book.author || book.publishedAt) && (
-                      <p>
-                        {[book.author, formatDateForDisplay(book.publishedAt)]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      </p>
-                    )}
-                    {book.description && (
-                      <p className="question-book-card__description">{book.description}</p>
-                    )}
-                    {book.readBook && (
-                      <div className="arrange-detail__read-book">
-                        <span>当日読まれた記録</span>
-                        <div className="question-book-card__details">
-                          <span
-                            className={`reading-status-badge reading-status-badge--${book.readBook.readingStatus}`}
-                          >
-                            {readingStatusLabel(book.readBook.readingStatus)}
-                          </span>
-                          {book.readBook.readRange && <span>{book.readBook.readRange}</span>}
-                        </div>
+                  <div className="question-book-card__content">
+                    {book.thumbnailURL ? (
+                      <img
+                        src={book.thumbnailURL}
+                        alt=""
+                        className="question-book-card__thumbnail"
+                      />
+                    ) : (
+                      <div className="question-book-card__thumbnail-placeholder" aria-hidden="true">
+                        <BookOpen />
                       </div>
                     )}
+                    <div className="question-book-card__info">
+                      <h3>{book.title}</h3>
+                      {(book.author || book.publishedAt) && (
+                        <p>
+                          {[book.author, formatDateForDisplay(book.publishedAt)]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </p>
+                      )}
+                      {book.description && (
+                        <p className="question-book-card__description">{book.description}</p>
+                      )}
+                      {book.readBook && (
+                        <div className="arrange-detail__read-book">
+                          <span>当日読まれた記録</span>
+                          <div className="question-book-card__details">
+                            <span
+                              className={`reading-status-badge reading-status-badge--${book.readBook.readingStatus}`}
+                            >
+                              {readingStatusLabel(book.readBook.readingStatus)}
+                            </span>
+                            {book.readBook.readRange && <span>{book.readBook.readRange}</span>}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </a>
                 <button

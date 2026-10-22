@@ -242,24 +242,30 @@ export default function ArrangeParticipate() {
             {books.map((book) => (
               <article className="question-book-card" key={book.id}>
                 <div className="question-book-card__link">
-                  {book.thumbnailURL ? (
-                    <img src={book.thumbnailURL} alt="" className="question-book-card__thumbnail" />
-                  ) : (
-                    <div className="question-book-card__thumbnail-placeholder" aria-hidden="true">
-                      <BookOpen />
-                    </div>
-                  )}
-                  <div className="question-book-card__info">
-                    <h3>{book.title}</h3>
-                    {book.author && <p>{book.author}</p>}
-                    <div className="question-book-card__details">
-                      <span
-                        className={`reading-status-badge reading-status-badge--${book.readingStatus}`}
-                      >
-                        {readingStatusLabel(book.readingStatus)}
-                      </span>
-                      {book.readDate && <span>{formatDateForDisplay(book.readDate)}</span>}
-                      {book.readRange && <span>{book.readRange}</span>}
+                  <div className="question-book-card__content">
+                    {book.thumbnailURL ? (
+                      <img
+                        src={book.thumbnailURL}
+                        alt=""
+                        className="question-book-card__thumbnail"
+                      />
+                    ) : (
+                      <div className="question-book-card__thumbnail-placeholder" aria-hidden="true">
+                        <BookOpen />
+                      </div>
+                    )}
+                    <div className="question-book-card__info">
+                      <h3>{book.title}</h3>
+                      {book.author && <p>{book.author}</p>}
+                      <div className="question-book-card__details">
+                        <span
+                          className={`reading-status-badge reading-status-badge--${book.readingStatus}`}
+                        >
+                          {readingStatusLabel(book.readingStatus)}
+                        </span>
+                        {book.readDate && <span>{formatDateForDisplay(book.readDate)}</span>}
+                        {book.readRange && <span>{book.readRange}</span>}
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -73,38 +73,6 @@ export function QuestionBookList({ books, onSelect, onDelete }: QuestionBookList
         <div className="question-book-list__items" aria-live="polite">
           {sortedBooks.map((book) => (
             <article className="question-book-card" key={book.localId}>
-              <a
-                className="question-book-card__link"
-                href={book.url || undefined}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {book.thumbnailURL ? (
-                  <img src={book.thumbnailURL} alt="" className="question-book-card__thumbnail" />
-                ) : (
-                  <div className="question-book-card__thumbnail-placeholder" aria-hidden="true">
-                    <BookOpen />
-                  </div>
-                )}
-                <div className="question-book-card__info">
-                  <h3>{book.title}</h3>
-                  <p>
-                    {book.author} · {formatDateForDisplay(book.publishedAt)}
-                  </p>
-                  {book.description && (
-                    <p className="question-book-card__description">{book.description}</p>
-                  )}
-                  <div className="question-book-card__details">
-                    <span
-                      className={`reading-status-badge reading-status-badge--${book.readingStatus}`}
-                    >
-                      {readingStatusLabels[book.readingStatus]}
-                    </span>
-                    {book.readDate && <span>{formatDateForDisplay(book.readDate)}</span>}
-                    {book.readRange && <span>{book.readRange}</span>}
-                  </div>
-                </div>
-              </a>
               <div className="question-book-card__actions">
                 <button
                   type="button"
@@ -123,6 +91,40 @@ export function QuestionBookList({ books, onSelect, onDelete }: QuestionBookList
                   <Trash2 aria-hidden="true" />
                 </button>
               </div>
+              <a
+                className="question-book-card__link"
+                href={book.url || undefined}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <div className="question-book-card__content">
+                  {book.thumbnailURL ? (
+                    <img src={book.thumbnailURL} alt="" className="question-book-card__thumbnail" />
+                  ) : (
+                    <div className="question-book-card__thumbnail-placeholder" aria-hidden="true">
+                      <BookOpen />
+                    </div>
+                  )}
+                  <div className="question-book-card__info">
+                    <h3>{book.title}</h3>
+                    <p>
+                      {book.author} · {formatDateForDisplay(book.publishedAt)}
+                    </p>
+                    {book.description && (
+                      <p className="question-book-card__description">{book.description}</p>
+                    )}
+                    <div className="question-book-card__details">
+                      <span
+                        className={`reading-status-badge reading-status-badge--${book.readingStatus}`}
+                      >
+                        {readingStatusLabels[book.readingStatus]}
+                      </span>
+                      {book.readDate && <span>{formatDateForDisplay(book.readDate)}</span>}
+                      {book.readRange && <span>{book.readRange}</span>}
+                    </div>
+                  </div>
+                </div>
+              </a>
             </article>
           ))}
         </div>
