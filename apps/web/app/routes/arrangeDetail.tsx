@@ -199,7 +199,8 @@ export default function ArrangeDetail() {
 
       <section className="arrange-detail__books" aria-labelledby="arrange-detail-books-title">
         <h2 id="arrange-detail-books-title" className="section-title">
-          {hasRecordedReadBooks ? "読んだ問題集リスト" : "読む問題集リスト"}
+          {hasRecordedReadBooks ? "読んだ問題集リスト" : "読む問題集リスト"}（全
+          {arrangement.books.length}冊）
         </h2>
         <div className="question-book-list__items">
           {arrangement.books.map((book) => (

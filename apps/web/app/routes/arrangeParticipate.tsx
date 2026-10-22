@@ -236,8 +236,7 @@ export default function ArrangeParticipate() {
 
         <section className="arrange-form__books" aria-labelledby="participate-books-title">
           <div className="arrange-form__section-heading">
-            <h2 id="participate-books-title">読む問題集リスト</h2>
-            <span>{books.length}冊</span>
+            <h2 id="participate-books-title">読む問題集リスト（全{books.length}冊）</h2>
           </div>
           <div className="question-book-list__items">
             {books.map((book) => (
