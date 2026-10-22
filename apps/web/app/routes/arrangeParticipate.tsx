@@ -241,6 +241,16 @@ export default function ArrangeParticipate() {
           <div className="question-book-list__items">
             {books.map((book) => (
               <article className="question-book-card" key={book.id}>
+                <div className="question-book-card__actions">
+                  <button
+                    type="button"
+                    className="question-book-card__edit"
+                    aria-label={`${book.title}の読了状況を編集`}
+                    onClick={() => setEditingBook(book)}
+                  >
+                    <Pencil aria-hidden="true" />
+                  </button>
+                </div>
                 <div className="question-book-card__link">
                   <div className="question-book-card__content">
                     {book.thumbnailURL ? (
@@ -269,14 +279,6 @@ export default function ArrangeParticipate() {
                     </div>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  className="question-book-card__edit"
-                  aria-label={`${book.title}の読了状況を編集`}
-                  onClick={() => setEditingBook(book)}
-                >
-                  <Pencil aria-hidden="true" />
-                </button>
               </article>
             ))}
           </div>
