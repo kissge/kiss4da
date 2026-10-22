@@ -88,6 +88,29 @@ export default function ArrangeDetail() {
     }
   };
 
+  const copyBookText = async (title: string, url: string) => {
+    try {
+      await navigator.clipboard.writeText(`${title} ${url}`);
+      toast.success("問題集情報をコピーしました。");
+    } catch (reason: unknown) {
+      setCopyError(
+        reason instanceof Error ? reason.message : "問題集情報をコピーできませんでした。",
+      );
+    }
+  };
+
+  const copyAllBookText = async () => {
+    try {
+      const text = arrangement?.books.map((book) => `${book.title} ${book.url}`).join("\n") ?? "";
+      await navigator.clipboard.writeText(text);
+      toast.success("問題集情報をまとめてコピーしました。");
+    } catch (reason: unknown) {
+      setCopyError(
+        reason instanceof Error ? reason.message : "問題集情報をコピーできませんでした。",
+      );
+    }
+  };
+
   if (error) {
     return (
       <section className="page">
@@ -208,10 +231,20 @@ export default function ArrangeDetail() {
       </header>
 
       <section className="arrange-detail__books" aria-labelledby="arrange-detail-books-title">
-        <h2 id="arrange-detail-books-title" className="section-title">
-          {hasRecordedReadBooks ? "読んだ問題集リスト" : "読む問題集リスト"}（全
-          {arrangement.books.length}冊）
-        </h2>
+        <div className="arrange-detail__books-heading">
+          <h2 id="arrange-detail-books-title" className="section-title">
+            {hasRecordedReadBooks ? "読んだ問題集リスト" : "読む問題集リスト"}（全
+            {arrangement.books.length}冊）
+          </h2>
+          <button
+            type="button"
+            className="arrange-detail__copy-url"
+            onClick={() => void copyAllBookText()}
+          >
+            <Copy aria-hidden="true" />
+            コピー
+          </button>
+        </div>
         <div className="question-book-list__items">
           {arrangement.books.map((book) => (
             <div className="arrange-detail__book-item" key={book.id}>
@@ -256,6 +289,14 @@ export default function ArrangeDetail() {
                     )}
                   </div>
                 </a>
+                <button
+                  type="button"
+                  className="question-book-card__edit"
+                  aria-label={`${book.title}のタイトルとURLをコピー`}
+                  onClick={() => void copyBookText(book.title, book.url)}
+                >
+                  <Copy aria-hidden="true" />
+                </button>
               </article>
               {book.participants.length > 0 && (
                 <details className="arrange-detail__reading-details">
