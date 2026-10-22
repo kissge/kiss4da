@@ -1,3 +1,4 @@
+import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
@@ -27,9 +28,7 @@ export default function Arrange() {
             最近参加した調整
           </h1>
           <Link to="/arrange/new" className="arrange-list__add">
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeWidth="2" d="M12 5v14M5 12h14" />
-            </svg>
+            <Plus aria-hidden="true" />
             <span>新規作成</span>
           </Link>
         </div>

@@ -1,3 +1,4 @@
+import { Pencil, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 
@@ -230,14 +231,7 @@ export default function ArrangeNew() {
                     aria-label={`${book.title}を編集`}
                     onClick={() => setEditingBook(book)}
                   >
-                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="1.8"
-                        d="m16.862 3.487 3.65 3.65M5 19l3.75-.75L19.7 7.3a2.58 2.58 0 0 0-3.65-3.65L5.1 14.6 5 19Z"
-                      />
-                    </svg>
+                    <Pencil aria-hidden="true" />
                   </button>
                   <button
                     type="button"
@@ -247,14 +241,7 @@ export default function ArrangeNew() {
                       setBooks((currentBooks) => currentBooks.filter((item) => item.id !== book.id))
                     }
                   >
-                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="1.8"
-                        d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7l1-3h4l1 3"
-                      />
-                    </svg>
+                    <Trash2 aria-hidden="true" />
                   </button>
                 </div>
               </article>

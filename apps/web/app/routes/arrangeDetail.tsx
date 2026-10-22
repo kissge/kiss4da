@@ -1,3 +1,4 @@
+import { DoorOpen, Pencil, UserRoundPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 
@@ -119,14 +120,7 @@ export default function ArrangeDetail() {
               to={`/arrange/${arrangement.id}/participate`}
               className="arrange-detail__participate"
             >
-              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.8"
-                  d="m14.5 5.5 4 4M5 19l3.2-.7L19.7 6.8a1.8 1.8 0 0 0-2.5-2.5L5.7 15.8 5 19Z"
-                />
-              </svg>
+              <Pencil aria-hidden="true" />
               読了状況を編集する
             </Link>
             <button
@@ -135,22 +129,7 @@ export default function ArrangeDetail() {
               onClick={() => void leaveArrangement()}
               disabled={isLeaving}
             >
-              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.8"
-                  d="M14 4H5v16h9"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.8"
-                  d="M10 12h10m-3-3 3 3-3 3"
-                />
-                <circle cx="8" cy="8" r="1.4" />
-                <path strokeLinecap="round" strokeWidth="1.8" d="M8 10v5m0 0-2 3m2-3 2 3" />
-              </svg>
+              <DoorOpen aria-hidden="true" />
               {isLeaving ? "退会中..." : "参加をやめる"}
             </button>
           </div>
@@ -159,15 +138,7 @@ export default function ArrangeDetail() {
             to={`/arrange/${arrangement.id}/participate`}
             className="arrange-detail__participate"
           >
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.8"
-                d="M8 11.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.5 19.5v-1.25A4.25 4.25 0 0 1 7.75 14h.5a4.25 4.25 0 0 1 4.25 4.25v1.25M16 10V
-4m-3 3h6"
-              />
-            </svg>
+            <UserRoundPlus aria-hidden="true" />
             参加する
           </Link>
         )}

@@ -1,3 +1,4 @@
+import { Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
@@ -267,14 +268,7 @@ export default function ArrangeParticipate() {
                   aria-label={`${book.title}の読了状況を編集`}
                   onClick={() => setEditingBook(book)}
                 >
-                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1.8"
-                      d="m16.862 3.487 3.65 3.65M5 19l3.75-.75L19.7 7.3a2.58 2.58 0 0 0-3.65-3.65L5.1 14.6 5 19Z"
-                    />
-                  </svg>
+                  <Pencil aria-hidden="true" />
                 </button>
               </article>
             ))}
