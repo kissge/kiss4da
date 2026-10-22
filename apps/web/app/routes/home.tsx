@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { BookDialog } from "../components/BookDialog";
 import { QuestionBookList } from "../components/QuestionBookList";
 import { QuestionBookSearch } from "../components/QuestionBookSearch";
-import { listSavedBooks } from "../lib/bookRepository";
+import { deleteBook, listSavedBooks } from "../lib/bookRepository";
 import type { Book, BookFormValues, SavedBook } from "../lib/types";
 
 export function meta() {
@@ -66,6 +66,17 @@ export default function Home() {
     }
   };
 
+  const deleteSavedBook = (book: SavedBook) => {
+    if (!window.confirm(`「${book.title}」を本棚から削除しますか？`)) return;
+
+    try {
+      deleteBook(book.localId);
+      refreshSavedBooks();
+    } catch (error) {
+      setStorageError(error instanceof Error ? error.message : "問題集を削除できませんでした。");
+    }
+  };
+
   useEffect(() => {
     refreshSavedBooks();
   }, []);
@@ -83,7 +94,7 @@ export default function Home() {
           {storageError}
         </p>
       )}
-      <QuestionBookList books={savedBooks} onSelect={openEditDialog} />
+      <QuestionBookList books={savedBooks} onSelect={openEditDialog} onDelete={deleteSavedBook} />
 
       {formValues && (
         <BookDialog

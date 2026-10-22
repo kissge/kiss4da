@@ -1,4 +1,4 @@
-import { BookOpen, Pencil } from "lucide-react";
+import { BookOpen, Pencil, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { formatDateForDisplay } from "../lib/date";
@@ -7,6 +7,7 @@ import type { SavedBook } from "../lib/types";
 type QuestionBookListProps = {
   books: SavedBook[];
   onSelect: (book: SavedBook) => void;
+  onDelete: (book: SavedBook) => void;
 };
 
 const readingStatusLabels = {
@@ -17,7 +18,7 @@ const readingStatusLabels = {
 
 type SortOrder = "updatedAt" | "publishedAt";
 
-export function QuestionBookList({ books, onSelect }: QuestionBookListProps) {
+export function QuestionBookList({ books, onSelect, onDelete }: QuestionBookListProps) {
   const [sortOrder, setSortOrder] = useState<SortOrder>("updatedAt");
   const sortedBooks = useMemo(
     () =>
@@ -104,14 +105,24 @@ export function QuestionBookList({ books, onSelect }: QuestionBookListProps) {
                   </div>
                 </div>
               </a>
-              <button
-                type="button"
-                className="question-book-card__edit"
-                aria-label={`${book.title}を編集`}
-                onClick={() => onSelect(book)}
-              >
-                <Pencil aria-hidden="true" />
-              </button>
+              <div className="question-book-card__actions">
+                <button
+                  type="button"
+                  className="question-book-card__edit"
+                  aria-label={`${book.title}を編集`}
+                  onClick={() => onSelect(book)}
+                >
+                  <Pencil aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  className="question-book-card__delete"
+                  aria-label={`${book.title}を削除`}
+                  onClick={() => onDelete(book)}
+                >
+                  <Trash2 aria-hidden="true" />
+                </button>
+              </div>
             </article>
           ))}
         </div>

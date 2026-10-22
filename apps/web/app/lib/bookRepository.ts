@@ -49,3 +49,16 @@ export function updateBook(localId: string, values: BookFormValues): SavedBook {
 
   return updatedBook;
 }
+
+export function deleteBook(localId: string): void {
+  const database = readDatabase();
+
+  if (!database.books.some((book) => book.localId === localId)) {
+    throw new Error("削除対象の問題集が見つかりませんでした。");
+  }
+
+  writeDatabase({
+    ...database,
+    books: database.books.filter((book) => book.localId !== localId),
+  });
+}
