@@ -1,4 +1,5 @@
 import { BookOpen, Pencil } from "lucide-react";
+import { useMemo, useState } from "react";
 
 import { formatDateForDisplay } from "../lib/date";
 import type { SavedBook } from "../lib/types";
@@ -14,14 +15,55 @@ const readingStatusLabels = {
   read: "既読",
 } as const;
 
+type SortOrder = "updatedAt" | "publishedAt";
+
 export function QuestionBookList({ books, onSelect }: QuestionBookListProps) {
-  const sortedBooks = [...books].sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt));
+  const [sortOrder, setSortOrder] = useState<SortOrder>("updatedAt");
+  const sortedBooks = useMemo(
+    () =>
+      [...books].sort((a, b) => {
+        if (sortOrder === "publishedAt") {
+          const publishedAtA = Date.parse(a.publishedAt);
+          const publishedAtB = Date.parse(b.publishedAt);
+          if (Number.isNaN(publishedAtA) || Number.isNaN(publishedAtB)) {
+            if (Number.isNaN(publishedAtA) && !Number.isNaN(publishedAtB)) return 1;
+            if (!Number.isNaN(publishedAtA) && Number.isNaN(publishedAtB)) return -1;
+          } else {
+            const publishedAtDifference = publishedAtB - publishedAtA;
+            if (publishedAtDifference !== 0) return publishedAtDifference;
+          }
+        }
+
+        return Date.parse(b.updatedAt) - Date.parse(a.updatedAt);
+      }),
+    [books, sortOrder],
+  );
 
   return (
     <section className="question-book-list" aria-labelledby="question-book-list-title">
-      <h2 id="question-book-list-title" className="section-title">
-        自分の本棚（全{sortedBooks.length}件）
-      </h2>
+      <div className="question-book-list__header">
+        <h2 id="question-book-list-title" className="section-title">
+          自分の本棚（全{books.length}件）
+        </h2>
+        <div className="question-book-list__sort" aria-label="本棚の並び順">
+          <button
+            type="button"
+            className={sortOrder === "updatedAt" ? "question-book-list__sort--active" : ""}
+            aria-pressed={sortOrder === "updatedAt"}
+            onClick={() => setSortOrder("updatedAt")}
+          >
+            追加・更新順
+          </button>
+          <button
+            type="button"
+            className={sortOrder === "publishedAt" ? "question-book-list__sort--active" : ""}
+            aria-pressed={sortOrder === "publishedAt"}
+            onClick={() => setSortOrder("publishedAt")}
+          >
+            出版日順
+          </button>
+        </div>
+      </div>
       {sortedBooks.length === 0 ? (
         <div className="question-book-list__empty" aria-live="polite">
           <p>登録した問題集はありません。</p>
