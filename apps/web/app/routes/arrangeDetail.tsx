@@ -1,4 +1,4 @@
-import { BookOpenCheck, DoorOpen, Pencil, UserRoundPlus } from "lucide-react";
+import { BookOpenCheck, DoorOpen, Pencil, UserRoundPlus, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 
@@ -204,6 +204,7 @@ export default function ArrangeDetail() {
               {book.participants.length > 0 && (
                 <details className="arrange-detail__reading-details">
                   <summary>
+                    <Users className="arrange-detail__reading-summary-icon" aria-hidden="true" />
                     <ReadingStatusSummary participants={book.participants} />
                   </summary>
                   <dl>

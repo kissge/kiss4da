@@ -89,7 +89,7 @@ export function QuestionBookSearch({
         <h2>問題集を追加</h2>
         <span>タイトルや著者名で検索</span>
       </div>
-      <form className="question-book-form" onSubmit={(event) => event.preventDefault()}>
+      <div className="question-book-form">
         <label className="sr-only" htmlFor="question-book-search">
           問題集を検索
         </label>
@@ -169,7 +169,7 @@ export function QuestionBookSearch({
         >
           追加
         </button>
-      </form>
+      </div>
     </div>
   );
 }

@@ -884,6 +884,14 @@ body {
   gap: 0.35rem;
 }
 
+.arrange-detail__reading-summary-icon {
+  height: 1.2rem;
+  vertical-align: middle;
+  width: 1.2rem;
+  display: inline-block;
+  margin-right: 0.5em;
+}
+
 .arrange-detail__reading-details dl {
   margin: 0.75rem 0 0;
 }
