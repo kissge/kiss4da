@@ -93,7 +93,14 @@ export function QuestionBookSearch({
         <label className="sr-only" htmlFor="question-book-search">
           問題集を検索
         </label>
-        <div className="question-book-combobox">
+        <div
+          className="question-book-combobox"
+          onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) {
+              setIsSuggestionsOpen(false);
+            }
+          }}
+        >
           <input
             id="question-book-search"
             name="questionBook"
