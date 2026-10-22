@@ -148,6 +148,15 @@ export default function ArrangeDetail() {
           <BookOpenCheck aria-hidden="true" />
           実際に当日読まれた問題集を記録する
         </Link>
+        {arrangement.books.some((book) => book.readBook) && (
+          <Link
+            to={`/arrange/${arrangement.id}/read-books/copy`}
+            className="arrange-detail__read-books"
+          >
+            <BookOpenCheck aria-hidden="true" />
+            当日の記録を本棚にコピーする
+          </Link>
+        )}
       </header>
 
       <section className="arrange-detail__books" aria-labelledby="arrange-detail-books-title">
