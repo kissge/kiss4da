@@ -43,7 +43,7 @@ const createArrangementSchema = z
       if (ids.has(book.id)) {
         context.addIssue({
           code: "custom",
-          message: "読む本リストに同じ本を重複して登録できません。",
+          message: "読む問題集リストに同じ問題集を重複して登録できません。",
           path: ["books", index, "id"],
         });
       }
@@ -72,7 +72,7 @@ const participateArrangementSchema = z
       if (ids.has(book.id)) {
         context.addIssue({
           code: "custom",
-          message: "同じ本が複数回送信されています。",
+          message: "同じ問題集が複数回送信されています。",
           path: ["books", index, "id"],
         });
       }

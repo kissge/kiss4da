@@ -163,7 +163,7 @@ export default function ArrangeDetail() {
 
       <section className="arrange-detail__books" aria-labelledby="arrange-detail-books-title">
         <h2 id="arrange-detail-books-title" className="section-title">
-          {hasRecordedReadBooks ? "読んだ本リスト" : "読む本リスト"}
+          {hasRecordedReadBooks ? "読んだ問題集リスト" : "読む問題集リスト"}
         </h2>
         <div className="question-book-list__items">
           {arrangement.books.map((book) => (

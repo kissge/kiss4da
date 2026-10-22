@@ -14,7 +14,7 @@ import type { Book, BookFormValues, SavedBook } from "../lib/types";
 export function meta() {
   return [
     { title: "調整を新規作成 | kiss4da" },
-    { name: "description", content: "読む本と日程の調整を新規作成します。" },
+    { name: "description", content: "押し会で読む問題集の調整を新規作成します。" },
   ];
 }
 
@@ -236,7 +236,7 @@ export default function ArrangeNew() {
                   <button
                     type="button"
                     className="question-book-card__delete"
-                    aria-label={`${book.title}を読む本リストから削除`}
+                    aria-label={`${book.title}を読む問題集リストから削除`}
                     onClick={() =>
                       setBooks((currentBooks) => currentBooks.filter((item) => item.id !== book.id))
                     }

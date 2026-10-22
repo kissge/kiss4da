@@ -14,8 +14,8 @@ function PeopleIcon({ className }: TabIconProps) {
 }
 
 const tabs = [
-  { to: "/", label: "問題集管理", Icon: BookIcon },
-  { to: "/arrange", label: "読むやつ調整", Icon: PeopleIcon },
+  { to: "/", label: "本棚", Icon: BookIcon },
+  { to: "/arrange", label: "押し会調整", Icon: PeopleIcon },
 ] as const;
 
 export function BottomTabBar() {

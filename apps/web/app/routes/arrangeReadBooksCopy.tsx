@@ -15,7 +15,7 @@ type ReadBook = ArrangementBook & {
 export function meta() {
   return [
     { title: "当日の記録を本棚にコピー | kiss4da" },
-    { name: "description", content: "調整当日の読書記録を本棚にコピーします。" },
+    { name: "description", content: "調整当日に実際に読んだ記録を本棚にコピーします。" },
   ];
 }
 

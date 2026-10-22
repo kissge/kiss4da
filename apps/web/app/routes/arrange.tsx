@@ -8,8 +8,8 @@ import type { SavedArrangement } from "../lib/types";
 
 export function meta() {
   return [
-    { title: "読むやつ調整 | kiss4da" },
-    { name: "description", content: "読むやつを調整します。" },
+    { title: "押し会調整 | kiss4da" },
+    { name: "description", content: "押し会で読む問題集の調整を行います。" },
   ];
 }
 

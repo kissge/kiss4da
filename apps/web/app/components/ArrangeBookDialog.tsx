@@ -50,7 +50,7 @@ export function ArrangeBookDialog({ values, onChange, onClose, onSave }: Arrange
         >
           ×
         </button>
-        <h2 id="arrange-book-title">読む本を編集</h2>
+        <h2 id="arrange-book-title">読む問題集を編集</h2>
         <form
           className="book-dialog__form"
           onSubmit={(event) => {

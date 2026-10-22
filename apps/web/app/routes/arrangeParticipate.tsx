@@ -212,7 +212,7 @@ export default function ArrangeParticipate() {
 
       {savedBookCount === 0 ? (
         <p className="arrange-participate__notice">
-          kiss4daを使って本棚にこれまで読んだ問題集を登録すると、読むやつ調整が簡単にできます。
+          kiss4daを使って本棚にこれまで読んだ問題集を登録すると、押し会で読む問題集の調整が簡単にできます。
         </p>
       ) : (
         autoFilledCount > 0 && (
@@ -236,7 +236,7 @@ export default function ArrangeParticipate() {
 
         <section className="arrange-form__books" aria-labelledby="participate-books-title">
           <div className="arrange-form__section-heading">
-            <h2 id="participate-books-title">読む本リスト</h2>
+            <h2 id="participate-books-title">読む問題集リスト</h2>
             <span>{books.length}冊</span>
           </div>
           <div className="question-book-list__items">
