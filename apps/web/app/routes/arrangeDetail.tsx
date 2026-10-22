@@ -1,4 +1,4 @@
-import { BookOpenCheck, DoorOpen, Pencil, UserRoundPlus, Users } from "lucide-react";
+import { BookOpen, BookOpenCheck, DoorOpen, Pencil, UserRoundPlus, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 
@@ -179,7 +179,7 @@ export default function ArrangeDetail() {
                     <img src={book.thumbnailURL} alt="" className="question-book-card__thumbnail" />
                   ) : (
                     <div className="question-book-card__thumbnail-placeholder" aria-hidden="true">
-                      本
+                      <BookOpen />
                     </div>
                   )}
                   <div className="question-book-card__info">

@@ -423,6 +423,11 @@ body {
   width: 3rem;
 }
 
+.question-book-card__thumbnail-placeholder svg {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
 .form-error {
   color: #b91c1c;
   font-size: 0.85rem;
@@ -671,6 +676,14 @@ body {
   flex: 0 0 auto;
   height: 1.2rem;
   width: 1.2rem;
+}
+
+.arrange-read-book__thumbnail {
+  border-radius: 0.2rem;
+  flex: 0 0 auto;
+  height: 2rem;
+  object-fit: cover;
+  width: 1.35rem;
 }
 
 .arrange-read-book__author {

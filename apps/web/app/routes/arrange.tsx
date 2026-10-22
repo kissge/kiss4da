@@ -25,7 +25,7 @@ export default function Arrange() {
       <section className="arrange-list" aria-labelledby="arrange-list-title">
         <div className="arrange-list__header">
           <h1 id="arrange-list-title" className="section-title">
-            最近参加した調整
+            最近参加した押し会の調整
           </h1>
           <Link to="/arrange/new" className="arrange-list__add">
             <Plus aria-hidden="true" />

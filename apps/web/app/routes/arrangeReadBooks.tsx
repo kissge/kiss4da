@@ -1,8 +1,9 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
 import { apiClient } from "../lib/apiClient";
+import { listSavedBooks } from "../lib/bookRepository";
 
 type Arrangement = Awaited<ReturnType<typeof fetchArrangement>>;
 type ReadBook = {
@@ -29,6 +30,7 @@ export default function ArrangeReadBooks() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [arrangement, setArrangement] = useState<Arrangement | null>(null);
+  const [savedBooks, setSavedBooks] = useState(() => listSavedBooks());
   const [books, setBooks] = useState<ReadBook[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,8 +43,8 @@ export default function ArrangeReadBooks() {
     }
 
     void Promise.all([fetchArrangement(id), fetchReadBooks(id)])
-      .then(([result, savedBooks]) => {
-        const savedById = new Map(savedBooks.map((book) => [book.bookId, book]));
+      .then(([result, readBooks]) => {
+        const savedById = new Map(readBooks.map((book) => [book.bookId, book]));
         setArrangement(result);
         setBooks(
           result.books.map((book) => {
@@ -56,6 +58,7 @@ export default function ArrangeReadBooks() {
             );
           }),
         );
+        setSavedBooks(listSavedBooks());
       })
       .catch((reason: unknown) => {
         setError(reason instanceof Error ? reason.message : "読書記録を読み込めませんでした。");
@@ -114,6 +117,7 @@ export default function ArrangeReadBooks() {
   }
 
   const bookById = new Map(arrangement.books.map((book) => [book.id, book]));
+  const savedBookById = new Map(savedBooks.map((book) => [book.id, book]));
 
   return (
     <section className="page">
@@ -133,10 +137,17 @@ export default function ArrangeReadBooks() {
           {books.map((book) => {
             const details = bookById.get(book.bookId);
             if (!details) return null;
+            const thumbnailURL =
+              details.thumbnailURL || savedBookById.get(book.bookId)?.thumbnailURL;
 
             return (
               <article className="arrange-read-book" key={book.bookId}>
                 <div className="arrange-read-book__heading">
+                  {thumbnailURL ? (
+                    <img src={thumbnailURL} alt="" className="arrange-read-book__thumbnail" />
+                  ) : (
+                    <BookOpen aria-hidden="true" />
+                  )}
                   <h2>{details.title}</h2>
                 </div>
                 {details.author && <p className="arrange-read-book__author">{details.author}</p>}

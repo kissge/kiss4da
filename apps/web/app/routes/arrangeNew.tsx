@@ -1,4 +1,4 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { BookOpen, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 
@@ -204,7 +204,7 @@ export default function ArrangeNew() {
                     <img src={book.thumbnailURL} alt="" className="question-book-card__thumbnail" />
                   ) : (
                     <div className="question-book-card__thumbnail-placeholder" aria-hidden="true">
-                      本
+                      <BookOpen />
                     </div>
                   )}
                   <div className="question-book-card__info">

@@ -1,4 +1,4 @@
-import { Pencil } from "lucide-react";
+import { BookOpen, Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
@@ -247,7 +247,7 @@ export default function ArrangeParticipate() {
                     <img src={book.thumbnailURL} alt="" className="question-book-card__thumbnail" />
                   ) : (
                     <div className="question-book-card__thumbnail-placeholder" aria-hidden="true">
-                      本
+                      <BookOpen />
                     </div>
                   )}
                   <div className="question-book-card__info">

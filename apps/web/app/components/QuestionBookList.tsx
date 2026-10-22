@@ -1,4 +1,4 @@
-import { Pencil } from "lucide-react";
+import { BookOpen, Pencil } from "lucide-react";
 
 import { formatDateForDisplay } from "../lib/date";
 import type { SavedBook } from "../lib/types";
@@ -36,7 +36,13 @@ export function QuestionBookList({ books, onSelect }: QuestionBookListProps) {
                 target="_blank"
                 rel="noreferrer"
               >
-                <img src={book.thumbnailURL} alt="" className="question-book-card__thumbnail" />
+                {book.thumbnailURL ? (
+                  <img src={book.thumbnailURL} alt="" className="question-book-card__thumbnail" />
+                ) : (
+                  <div className="question-book-card__thumbnail-placeholder" aria-hidden="true">
+                    <BookOpen />
+                  </div>
+                )}
                 <div className="question-book-card__info">
                   <h3>{book.title}</h3>
                   <p>{book.author}</p>
