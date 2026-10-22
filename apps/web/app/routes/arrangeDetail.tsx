@@ -1,4 +1,4 @@
-import { DoorOpen, Pencil, UserRoundPlus } from "lucide-react";
+import { BookOpenCheck, DoorOpen, Pencil, UserRoundPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 
@@ -142,6 +142,10 @@ export default function ArrangeDetail() {
             参加する
           </Link>
         )}
+        <Link to={`/arrange/${arrangement.id}/read-books`} className="arrange-detail__read-books">
+          <BookOpenCheck aria-hidden="true" />
+          実際に当日読んだ問題集を記録する
+        </Link>
       </header>
 
       <section className="arrange-detail__books" aria-labelledby="arrange-detail-books-title">

@@ -85,6 +85,48 @@ const participantUserIdParamSchema = z.object({
   userId: z.string().trim().min(1),
 });
 
+const readBooksSchema = z
+  .object({
+    books: z.array(
+      z
+        .object({
+          bookId: z.string().trim().min(1),
+          readingStatus: z.enum(["unread", "partially-read", "read"]),
+          readRange: z.string().default(""),
+        })
+        .superRefine((book, context) => {
+          if (book.readingStatus === "partially-read" && !book.readRange.trim()) {
+            context.addIssue({
+              code: "custom",
+              message: "一部既読の場合は読んだ範囲を入力してください。",
+              path: ["readRange"],
+            });
+          }
+          if (book.readingStatus !== "partially-read" && book.readRange.trim()) {
+            context.addIssue({
+              code: "custom",
+              message: "一部既読以外では読んだ範囲を空にしてください。",
+              path: ["readRange"],
+            });
+          }
+        }),
+    ),
+  })
+  .superRefine((value, context) => {
+    const ids = new Set<string>();
+
+    for (const [index, book] of value.books.entries()) {
+      if (ids.has(book.bookId)) {
+        context.addIssue({
+          code: "custom",
+          message: "同じ問題集が複数回送信されています。",
+          path: ["books", index, "bookId"],
+        });
+      }
+      ids.add(book.bookId);
+    }
+  });
+
 const app = new Hono<{ Bindings: ApiBindings }>()
   .use(
     "*",
@@ -316,26 +358,28 @@ const app = new Hono<{ Bindings: ApiBindings }>()
           )
           .bind(unknownBookId, arrangementId, book.position, book.title, book.author, book.url);
       }),
-      ...input.books.map((book) =>
-        database
-          .prepare(
-            `INSERT INTO arrangement_participant_books
+      ...input.books
+        .filter((book) => book.readingStatus !== "unread")
+        .map((book) =>
+          database
+            .prepare(
+              `INSERT INTO arrangement_participant_books
                (participant_id, arrangement_id, book_id, reading_status, read_range, read_date)
              SELECT ?1, ?2, ?3, ?4, ?5, ?6
              WHERE EXISTS (
                SELECT 1 FROM arrangement_books
                WHERE arrangement_id = ?2 AND book_id = ?3
              )`,
-          )
-          .bind(
-            participantId,
-            arrangementId,
-            book.id,
-            book.readingStatus,
-            book.readRange,
-            book.readDate,
-          ),
-      ),
+            )
+            .bind(
+              participantId,
+              arrangementId,
+              book.id,
+              book.readingStatus,
+              book.readRange,
+              book.readDate,
+            ),
+        ),
       ...input.books
         .filter((book) => unknownBookIds.has(book.id))
         .map((book) =>
@@ -358,6 +402,84 @@ const app = new Hono<{ Bindings: ApiBindings }>()
     await database.batch(statements);
 
     return c.json({ id: arrangementId }, 201);
+  })
+  .get("/arrangements/:id/read-books", async (c) => {
+    const database = getDatabase(c.env);
+    const arrangementId = c.req.param("id");
+    const arrangement = await database
+      .prepare("SELECT id FROM arrangements WHERE id = ?1")
+      .bind(arrangementId)
+      .first<{ id: string }>();
+
+    if (!arrangement) {
+      return c.json({ message: "調整が見つかりませんでした。" }, 404);
+    }
+
+    const { results } = await database
+      .prepare(
+        `SELECT
+           book_id AS bookId,
+           reading_status AS readingStatus,
+           read_range AS readRange
+         FROM arrangement_read_books
+         WHERE arrangement_id = ?1
+         ORDER BY book_id`,
+      )
+      .bind(arrangementId)
+      .all<{
+        bookId: string;
+        readingStatus: "partially-read" | "read";
+        readRange: string;
+      }>();
+
+    return c.json({ books: results });
+  })
+  .put("/arrangements/:id/read-books", zValidator("json", readBooksSchema), async (c) => {
+    const input = c.req.valid("json");
+    const database = getDatabase(c.env);
+    const arrangementId = c.req.param("id");
+    const arrangement = await database
+      .prepare("SELECT id FROM arrangements WHERE id = ?1")
+      .bind(arrangementId)
+      .first<{ id: string }>();
+
+    if (!arrangement) {
+      return c.json({ message: "調整が見つかりませんでした。" }, 404);
+    }
+
+    const { results: arrangementBooks } = await database
+      .prepare(
+        `SELECT book_id AS bookId
+           FROM arrangement_books
+           WHERE arrangement_id = ?1`,
+      )
+      .bind(arrangementId)
+      .all<{ bookId: string }>();
+    const allowedBookIds = new Set(arrangementBooks.map((book) => book.bookId));
+    const invalidBook = input.books.find((book) => !allowedBookIds.has(book.bookId));
+
+    if (invalidBook) {
+      return c.json({ message: "調整に含まれない問題集が送信されました。" }, 400);
+    }
+
+    await database.batch([
+      database
+        .prepare("DELETE FROM arrangement_read_books WHERE arrangement_id = ?1")
+        .bind(arrangementId),
+      ...input.books
+        .filter((book) => book.readingStatus !== "unread")
+        .map((book) =>
+          database
+            .prepare(
+              `INSERT INTO arrangement_read_books
+                 (arrangement_id, book_id, reading_status, read_range)
+               VALUES (?1, ?2, ?3, ?4)`,
+            )
+            .bind(arrangementId, book.bookId, book.readingStatus, book.readRange.trim()),
+        ),
+    ]);
+
+    return c.json({ saved: input.books.length });
   })
   .get("/arrangements/:id/participants/:userId", async (c) => {
     const database = getDatabase(c.env);
