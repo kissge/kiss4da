@@ -45,7 +45,12 @@ export function QuestionBookList({ books, onSelect }: QuestionBookListProps) {
                 )}
                 <div className="question-book-card__info">
                   <h3>{book.title}</h3>
-                  <p>{book.author}</p>
+                  <p>
+                    {book.author} · {formatDateForDisplay(book.publishedAt)}
+                  </p>
+                  {book.description && (
+                    <p className="question-book-card__description">{book.description}</p>
+                  )}
                   <div className="question-book-card__details">
                     <span
                       className={`reading-status-badge reading-status-badge--${book.readingStatus}`}

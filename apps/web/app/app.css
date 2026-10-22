@@ -1097,6 +1097,15 @@ body {
   white-space: nowrap;
 }
 
+.question-book-card__info .question-book-card__description {
+  display: -webkit-box;
+  margin-top: 0.35rem;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  white-space: normal;
+}
+
 .question-book-card__details {
   align-items: center;
   display: flex;

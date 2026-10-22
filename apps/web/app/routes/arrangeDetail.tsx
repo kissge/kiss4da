@@ -221,7 +221,16 @@ export default function ArrangeDetail() {
                   )}
                   <div className="question-book-card__info">
                     <h3>{book.title}</h3>
-                    {book.author && <p>{book.author}</p>}
+                    {(book.author || book.publishedAt) && (
+                      <p>
+                        {[book.author, formatDateForDisplay(book.publishedAt)]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </p>
+                    )}
+                    {book.description && (
+                      <p className="question-book-card__description">{book.description}</p>
+                    )}
                     {book.readBook && (
                       <div className="arrange-detail__read-book">
                         <span>当日読まれた記録</span>
