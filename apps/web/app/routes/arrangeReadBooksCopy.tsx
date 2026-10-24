@@ -65,7 +65,7 @@ export default function ArrangeReadBooksCopy() {
         if (!book.readBook || !selectedBookIds.has(book.id)) continue;
 
         const savedBook = savedBooks.find((saved) => saved.id === book.id);
-        const values = createBookValues(book, savedBook, book.readBook);
+        const values = createBookValues(book, savedBook, book.readBook, arrangement);
         if (savedBook) updateBook(savedBook.localId, values);
         else saveBook(values);
       }
@@ -158,6 +158,7 @@ function createBookValues(
   book: ArrangementBook,
   savedBook: SavedBook | undefined,
   readBook: NonNullable<ReadBook["readBook"]>,
+  arrangement: Arrangement,
 ): BookFormValues {
   return {
     id: book.id,
@@ -169,8 +170,8 @@ function createBookValues(
     thumbnailURL: book.thumbnailURL,
     owned: savedBook?.owned,
     readingStatus: readBook.readingStatus,
-    readDate: savedBook?.readDate ?? "",
-    readSession: savedBook?.readSession ?? "",
+    readDate: arrangement.heldOn ?? "",
+    readSession: arrangement.title,
     readRange: readBook.readRange,
     comment: savedBook?.comment ?? "",
   };
