@@ -30,6 +30,34 @@ export function saveArrangement(arrangement: SavedArrangement): SavedArrangement
   return arrangement;
 }
 
+export function updateSavedArrangement(
+  arrangement: Pick<SavedArrangement, "id" | "title" | "organizerName" | "heldOn">,
+): boolean {
+  const database = readDatabase();
+  const currentArrangement = database.arrangements.find((item) => item.id === arrangement.id);
+
+  if (!currentArrangement) {
+    return false;
+  }
+
+  if (
+    currentArrangement.title === arrangement.title &&
+    currentArrangement.organizerName === arrangement.organizerName &&
+    currentArrangement.heldOn === arrangement.heldOn
+  ) {
+    return false;
+  }
+
+  writeDatabase({
+    ...database,
+    arrangements: database.arrangements.map((item) =>
+      item.id === arrangement.id ? { ...item, ...arrangement } : item,
+    ),
+  });
+
+  return true;
+}
+
 function deduplicateArrangements(
   arrangements: SavedArrangement[],
   preferredId?: string,

@@ -12,6 +12,7 @@ import { Link, useParams } from "react-router";
 import { toast } from "sonner";
 
 import { apiClient } from "../lib/apiClient";
+import { updateSavedArrangement } from "../lib/arrangementRepository";
 import { formatDateForDisplay, formatDateOrFallback } from "../lib/date";
 import { getOrCreateInternalId } from "../lib/internalId";
 import { setPendingToast } from "../lib/toast";
@@ -43,6 +44,12 @@ export default function ArrangeDetail() {
     const userId = getOrCreateInternalId();
     void Promise.all([fetchArrangement(id), fetchParticipant(id, userId)])
       .then(([result, participant]) => {
+        updateSavedArrangement({
+          id: result.id,
+          title: result.title,
+          organizerName: result.organizerName,
+          heldOn: result.heldOn ?? "",
+        });
         setArrangement(result);
         setIsParticipant(participant);
       })
