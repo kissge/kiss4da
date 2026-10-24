@@ -828,6 +828,10 @@ body {
   margin-top: 0.9rem;
 }
 
+.arrange-read-book .reading-status {
+  margin-top: 0.9rem;
+}
+
 .arrange-read-book--copy {
   align-items: stretch;
   display: flex;
