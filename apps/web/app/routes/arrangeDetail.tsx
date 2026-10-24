@@ -194,47 +194,49 @@ export default function ArrangeDetail() {
             URLをコピーできませんでした。
           </p>
         )}
-        {isParticipant ? (
-          <div className="arrange-detail__participant-actions">
+        <div className="arrange-detail__actions">
+          {isParticipant ? (
+            <div className="arrange-detail__participant-actions">
+              <Link
+                to={`/arrange/${arrangement.id}/participate`}
+                className="arrange-detail__participate"
+              >
+                <Pencil aria-hidden="true" />
+                自分の読了状況を編集する
+              </Link>
+              <button
+                type="button"
+                className="arrange-detail__leave"
+                onClick={() => void leaveArrangement()}
+                disabled={isLeaving}
+              >
+                <DoorOpen aria-hidden="true" />
+                {isLeaving ? "退会中..." : "参加をやめる"}
+              </button>
+            </div>
+          ) : (
             <Link
               to={`/arrange/${arrangement.id}/participate`}
               className="arrange-detail__participate"
             >
-              <Pencil aria-hidden="true" />
-              自分の読了状況を編集する
+              <UserRoundPlus aria-hidden="true" />
+              参加する
             </Link>
-            <button
-              type="button"
-              className="arrange-detail__leave"
-              onClick={() => void leaveArrangement()}
-              disabled={isLeaving}
-            >
-              <DoorOpen aria-hidden="true" />
-              {isLeaving ? "退会中..." : "参加をやめる"}
-            </button>
-          </div>
-        ) : (
-          <Link
-            to={`/arrange/${arrangement.id}/participate`}
-            className="arrange-detail__participate"
-          >
-            <UserRoundPlus aria-hidden="true" />
-            参加する
-          </Link>
-        )}
-        <Link to={`/arrange/${arrangement.id}/read-books`} className="arrange-detail__read-books">
-          <BookOpenCheck aria-hidden="true" />
-          実際に当日読まれた問題集を記録する
-        </Link>
-        {arrangement.books.some((book) => book.readBook) && (
-          <Link
-            to={`/arrange/${arrangement.id}/read-books/copy`}
-            className="arrange-detail__read-books"
-          >
+          )}
+          <Link to={`/arrange/${arrangement.id}/read-books`} className="arrange-detail__read-books">
             <BookOpenCheck aria-hidden="true" />
-            当日の記録を本棚にコピーする
+            実際に当日読まれた問題集を記録する
           </Link>
-        )}
+          {arrangement.books.some((book) => book.readBook) && (
+            <Link
+              to={`/arrange/${arrangement.id}/read-books/copy`}
+              className="arrange-detail__read-books"
+            >
+              <BookOpenCheck aria-hidden="true" />
+              当日の記録を本棚にコピーする
+            </Link>
+          )}
+        </div>
       </header>
 
       <section className="arrange-detail__books" aria-labelledby="arrange-detail-books-title">
