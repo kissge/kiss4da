@@ -258,6 +258,16 @@ export default function ArrangeDetail() {
           {arrangement.books.map((book) => (
             <div className="arrange-detail__book-item" key={book.id}>
               <article className="question-book-card">
+                <div className="question-book-card__actions">
+                  <button
+                    type="button"
+                    className="question-book-card__edit"
+                    aria-label={`${book.title}のタイトルとURLをコピー`}
+                    onClick={() => void copyBookText(book.title, book.url)}
+                  >
+                    <Copy aria-hidden="true" />
+                  </button>
+                </div>
                 <a
                   className="question-book-card__link"
                   href={book.url || undefined}
@@ -304,14 +314,6 @@ export default function ArrangeDetail() {
                     </div>
                   </div>
                 </a>
-                <button
-                  type="button"
-                  className="question-book-card__edit"
-                  aria-label={`${book.title}のタイトルとURLをコピー`}
-                  onClick={() => void copyBookText(book.title, book.url)}
-                >
-                  <Copy aria-hidden="true" />
-                </button>
               </article>
               {book.participants.length > 0 && (
                 <details className="arrange-detail__reading-details">
