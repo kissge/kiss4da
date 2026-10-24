@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { saveBook, updateBook } from "../lib/bookRepository";
 import { formatDateForDisplay } from "../lib/date";
@@ -58,6 +59,7 @@ export function BookDialog({ values, onChange, onClose, onSaved, existingBook }:
                 updateBook(existingBook.localId, values);
               } else {
                 saveBook(values);
+                toast.success("問題集を本棚に追加しました。");
               }
               onSaved();
               onClose();
