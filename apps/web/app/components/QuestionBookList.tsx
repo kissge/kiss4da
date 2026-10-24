@@ -1,5 +1,5 @@
 import { BookOpen, Pencil, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { formatDateForDisplay } from "../lib/date";
 import type { SavedBook } from "../lib/types";
@@ -18,8 +18,29 @@ const readingStatusLabels = {
 
 type SortOrder = "updatedAt" | "publishedAt";
 
+const SORT_ORDER_STORAGE_KEY = "kiss4da.question-book-list.sort-order";
+
+function getSavedSortOrder(): SortOrder {
+  if (typeof window === "undefined") {
+    return "updatedAt";
+  }
+
+  const savedSortOrder = window.localStorage.getItem(SORT_ORDER_STORAGE_KEY);
+  return savedSortOrder === "publishedAt" || savedSortOrder === "updatedAt"
+    ? savedSortOrder
+    : "updatedAt";
+}
+
 export function QuestionBookList({ books, onSelect, onDelete }: QuestionBookListProps) {
-  const [sortOrder, setSortOrder] = useState<SortOrder>("updatedAt");
+  const [sortOrder, setSortOrder] = useState<SortOrder>(getSavedSortOrder);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(SORT_ORDER_STORAGE_KEY, sortOrder);
+    } catch (error) {
+      console.error("本棚の並び順を保存できませんでした。", error);
+    }
+  }, [sortOrder]);
+
   const sortedBooks = useMemo(
     () =>
       [...books].sort((a, b) => {
