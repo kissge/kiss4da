@@ -106,7 +106,10 @@ export function QuestionBookList({ books, onSelect, onDelete }: QuestionBookList
                     </div>
                   )}
                   <div className="question-book-card__info">
-                    <h3>{book.title}</h3>
+                    <h3>
+                      {book.owned === true && <span className="ownership-status-badge">所有</span>}
+                      {book.title}
+                    </h3>
                     <p>
                       {book.author} · {formatDateForDisplay(book.publishedAt)}
                     </p>

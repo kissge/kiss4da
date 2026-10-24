@@ -374,6 +374,55 @@ body {
   padding: 0.75rem 0.85rem;
 }
 
+.ownership-status {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.ownership-status legend {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  padding: 0;
+}
+
+.ownership-status__options {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ownership-status__option {
+  border: 1px solid #cbd5e1;
+  border-radius: 0.65rem;
+  color: #64748b;
+  cursor: pointer;
+  flex: 1;
+  font-size: 0.9rem;
+  padding: 0.65rem 0.5rem;
+  text-align: center;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.ownership-status__option--selected {
+  font-weight: 700;
+}
+
+.ownership-status__option--selected:first-child {
+  background: #fed7aa;
+  border-color: #fb923c;
+  color: #9a3412;
+}
+
+.ownership-status__option--selected:last-child {
+  background: #bbf7d0;
+  border-color: #4ade80;
+  color: #166534;
+}
+
 .form-field textarea {
   resize: vertical;
 }
@@ -1147,6 +1196,19 @@ body {
 
 .question-book-card__info h3 {
   font-size: 0.95rem;
+}
+
+.ownership-status-badge {
+  background: #bbf7d0;
+  border: 1px solid #4ade80;
+  border-radius: 0.4rem;
+  color: #166534;
+  display: inline-block;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  margin-right: 0.35rem;
+  padding: 0.1rem 0.35rem 0.05rem;
+  vertical-align: 0.08em;
 }
 
 .question-book-card__info p {

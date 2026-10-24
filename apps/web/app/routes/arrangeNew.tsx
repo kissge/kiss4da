@@ -39,6 +39,7 @@ function createBookFromQuery(query: string): Book | null {
 function createArrangeBook(book: Book, savedBook?: SavedBook): BookFormValues {
   return {
     ...book,
+    owned: savedBook?.owned,
     readingStatus: savedBook?.readingStatus ?? "unread",
     readDate: savedBook?.readDate ?? "",
     readSession: savedBook?.readSession ?? "",
@@ -89,6 +90,7 @@ export default function ArrangeNew() {
             return {
               ...book,
               thumbnailURL: book.thumbnailURL,
+              owned: undefined,
               readingStatus: participant?.readingStatus ?? "unread",
               readDate: participant?.readDate ?? "",
               readSession: "",

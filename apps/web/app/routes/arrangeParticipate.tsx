@@ -32,6 +32,7 @@ function createBookValues(
     description: book.description,
     url: book.url,
     thumbnailURL: book.thumbnailURL,
+    owned: savedBook?.owned,
     readingStatus: savedBook?.readingStatus ?? "unread",
     readDate: savedBook?.readDate ?? "",
     readSession: "",

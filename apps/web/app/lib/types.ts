@@ -9,6 +9,7 @@ export type Book = BooksResponse["results"][number];
 export type ReadingStatus = "unread" | "partially-read" | "read";
 
 export type BookFormValues = Book & {
+  owned?: boolean;
   readingStatus: ReadingStatus;
   readDate: string;
   readSession: string;

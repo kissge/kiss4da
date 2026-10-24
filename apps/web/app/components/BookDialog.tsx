@@ -118,6 +118,32 @@ export function BookDialog({ values, onChange, onClose, onSaved, existingBook }:
             />
           </label>
           <input type="hidden" name="thumbnailURL" value={values.thumbnailURL} />
+          <fieldset className="ownership-status">
+            <legend>所有状況</legend>
+            <div className="ownership-status__options">
+              {(
+                [
+                  [false, "未所有"],
+                  [true, "所有"],
+                ] as const
+              ).map(([owned, label]) => (
+                <label
+                  key={label}
+                  className={`ownership-status__option ${values.owned === owned ? "ownership-status__option--selected" : ""}`}
+                >
+                  <input
+                    className="sr-only"
+                    name="owned"
+                    type="radio"
+                    value={String(owned)}
+                    checked={values.owned !== undefined && values.owned === owned}
+                    onChange={() => update("owned", owned)}
+                  />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
           <fieldset className="reading-status">
             <legend>読んだ状況</legend>
             <div className="reading-status__options">
