@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpen } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
@@ -122,8 +122,7 @@ export default function ArrangeReadBooks() {
   return (
     <section className="page">
       <Link to={`/arrange/${arrangement.id}`} className="arrange-detail__back">
-        <ArrowLeft aria-hidden="true" />
-        {arrangement.title}へ戻る
+        ← {arrangement.title}へ戻る
       </Link>
       <header className="page-header arrange-read-books__header">
         <h1 className="page__title">実際に当日読んだ問題集を記録する</h1>
